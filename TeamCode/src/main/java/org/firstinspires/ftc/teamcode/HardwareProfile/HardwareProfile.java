@@ -36,10 +36,10 @@ public class HardwareProfile {
      */
 
     //Motors
-    public DcMotor motorR1 = null;  // Right Front Drive Motor
-    public DcMotor motorL1 = null;  // Left Front Drive Motor
-    public DcMotor motorL2 = null;  // Left Rear  Drive Motor
-    public DcMotor motorR2 = null;  // Right Rear Drive Motor
+    public DcMotor motorRF = null;  // Right Front Drive Motor
+    public DcMotor motorLF = null;  // Left Front Drive Motor
+    public DcMotor motorLR = null;  // Left Rear  Drive Motor
+    public DcMotor motorRR = null;  // Right Rear Drive Motor
 
     public BNO055IMU imu;       // Internal accelerometer / Gyro sensor
 
@@ -60,38 +60,37 @@ public class HardwareProfile {
 
 //initialize DcMotor motors
 
-        motorL1 = hwMap.dcMotor.get("motorL1");
-        motorL1.setDirection(DcMotor.Direction.REVERSE);
-        motorL1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorL1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorL1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorL1.setPower(0);
-
-        motorL2 = hwMap.dcMotor.get("motorL2");
-        motorL2.setDirection(DcMotor.Direction.REVERSE);
-        motorL2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorL2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorL2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorL2.setPower(0);
-
-        motorR1 = hwMap.dcMotor.get("motorR1");
-        motorR1.setDirection(DcMotor.Direction.FORWARD);
-        motorR1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorR1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorR1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorR1.setPower(0);
-
-        motorR2 = hwMap.dcMotor.get("motorR2");
-        motorR2.setDirection(DcMotor.Direction.FORWARD);
-        motorR2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorR2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorR2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorR2.setPower(0);
 
 
 //initialize servos
 //        intakeDeployPink = hwMap.servo.get("intakeDeployPink");
+        motorLF = hwMap.dcMotor.get("motorLF");
+        motorLF.setDirection(DcMotor.Direction.REVERSE);
+        motorLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorLF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorLF.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorLF.setPower(0);
 
+        motorLR = hwMap.dcMotor.get("motorLR");
+        motorLR.setDirection(DcMotor.Direction.REVERSE);
+        motorLR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorLR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorLR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorLR.setPower(0);
+
+        motorRF = hwMap.dcMotor.get("motorRF");
+        motorRF.setDirection(DcMotor.Direction.FORWARD);
+        motorRF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorRF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorRF.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorRF.setPower(0);
+
+        motorRR = hwMap.dcMotor.get("motorRR");
+        motorRR.setDirection(DcMotor.Direction.FORWARD);
+        motorRR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorRR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorRR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorRR.setPower(0);
 
 //initialize sensors
 //        sensorDistBlue=hwMap.get(DistanceSensor.class, "sensorDistBlue");
