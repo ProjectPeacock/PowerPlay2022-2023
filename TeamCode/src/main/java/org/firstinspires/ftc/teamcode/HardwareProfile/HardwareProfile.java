@@ -64,6 +64,7 @@ public class HardwareProfile {
 
 //initialize servos
 //        intakeDeployPink = hwMap.servo.get("intakeDeployPink");
+
         motorLF = hwMap.dcMotor.get("motorLF");
         motorLF.setDirection(DcMotor.Direction.REVERSE);
         motorLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
