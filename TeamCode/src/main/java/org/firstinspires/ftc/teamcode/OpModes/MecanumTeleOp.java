@@ -54,10 +54,10 @@ public class MecanumTeleOp extends LinearOpMode {
             rightY = -gamepad1.right_stick_y;
             r = -Math.hypot(gamepad1.left_stick_x, -gamepad1.left_stick_y);
 
-            v1 = (r * Math.cos(robotAngle - Math.toRadians(theta + theta2)) + rightX + rightY);
-            v2 = (r * Math.sin(robotAngle - Math.toRadians(theta + theta2)) - rightX + rightY);
-            v3 = (r * Math.sin(robotAngle - Math.toRadians(theta + theta2)) + rightX + rightY);
-            v4 = (r * Math.cos(robotAngle - Math.toRadians(theta + theta2)) - rightX + rightY);
+            v1 = (r * Math.cos(robotAngle - Math.toRadians(theta + theta2)) - rightX + rightY);
+            v2 = (r * Math.sin(robotAngle - Math.toRadians(theta + theta2)) + rightX + rightY);
+            v3 = (r * Math.sin(robotAngle - Math.toRadians(theta + theta2)) - rightX + rightY);
+            v4 = (r * Math.cos(robotAngle - Math.toRadians(theta + theta2)) + rightX + rightY);
 
             robot.motorLF.setPower(com.qualcomm.robotcore.util.Range.clip((v1), -power, power));
             robot.motorRF.setPower(com.qualcomm.robotcore.util.Range.clip((v2), -power, power));
