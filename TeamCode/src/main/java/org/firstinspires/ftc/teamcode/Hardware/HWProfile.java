@@ -57,6 +57,7 @@ public class HWProfile {
         motorLR.setPower(0);
         motorRF.setPower(0);
         motorRR.setPower(0);
+        motorLift.setPower(0);
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
