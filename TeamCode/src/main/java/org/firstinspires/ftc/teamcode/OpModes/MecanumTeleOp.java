@@ -81,10 +81,10 @@ public class MecanumTeleOp extends LinearOpMode {
             } else robot.motorLift.setPower(0);
 
             if(gamepad1.a){
-                robot.servoGrabber.setPosition(0.6);
+                robot.servoGrabber.setPosition(0.3);
             }
             if(gamepad1.b) {
-                robot.servoGrabber.setPosition(0.9);
+                robot.servoGrabber.setPosition(0.55);
             }
             // Provide user feedback
             telemetry.addData("V1 = ", v1);

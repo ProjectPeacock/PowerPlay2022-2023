@@ -67,7 +67,7 @@ public class HWProfile {
         motorRR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         servoGrabber = hwMap.get(Servo.class, "servoGrabber");
-
+        servoGrabber.setPosition(.5);
         imu = hwMap.get(BNO055IMU.class, "imu");
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
