@@ -13,28 +13,30 @@ public class MecanumTeleOp extends LinearOpMode {
     private final static HWProfile robot = new HWProfile();
 
     @Override
-    public void runOpMode(){
+    public void runOpMode() {
         double v1, v2, v3, v4, robotAngle;
         double theta;
-        double theta2 = 180;
+        double theta2 = 0;
         double r;
-        double power=0.5;
+        double power = 0.5;
         double rightX, rightY;
         boolean TSEFlag = false;
         boolean fieldCentric = false;
         int targetPosition = 0;
         double cupPosition = 0;
 
-        ElapsedTime currentTime= new ElapsedTime();
+        ElapsedTime currentTime = new ElapsedTime();
         double buttonPress = currentTime.time();
 
         robot.init(hardwareMap);
 
-        telemetry.addData("Ready to Run: ","GOOD LUCK");
+        telemetry.addData("Ready to Run: ", "GOOD LUCK");
         telemetry.update();
 
-        boolean shippingElement=false;
-        boolean armDeployed=false;
+        boolean shippingElement = false;
+        boolean armDeployed = false;
+
+        boolean clawOpen = true;
 
         waitForStart();
 
@@ -54,10 +56,10 @@ public class MecanumTeleOp extends LinearOpMode {
             rightY = -gamepad1.right_stick_y;
             r = -Math.hypot(gamepad1.left_stick_x, -gamepad1.left_stick_y);
 
-            v1 = (r * Math.cos(robotAngle - Math.toRadians(theta + theta2)) - rightX + rightY);
-            v2 = (r * Math.sin(robotAngle - Math.toRadians(theta + theta2)) + rightX + rightY);
-            v3 = (r * Math.sin(robotAngle - Math.toRadians(theta + theta2)) - rightX + rightY);
-            v4 = (r * Math.cos(robotAngle - Math.toRadians(theta + theta2)) + rightX + rightY);
+            v1 = (r * Math.cos(robotAngle - Math.toRadians(theta + theta2)) + rightX + rightY);
+            v2 = (r * Math.sin(robotAngle - Math.toRadians(theta + theta2)) - rightX + rightY);
+            v3 = (r * Math.sin(robotAngle - Math.toRadians(theta + theta2)) + rightX + rightY);
+            v4 = (r * Math.cos(robotAngle - Math.toRadians(theta + theta2)) - rightX + rightY);
 
             robot.motorLF.setPower(com.qualcomm.robotcore.util.Range.clip((v1), -power, power));
             robot.motorRF.setPower(com.qualcomm.robotcore.util.Range.clip((v2), -power, power));
@@ -65,7 +67,7 @@ public class MecanumTeleOp extends LinearOpMode {
             robot.motorRR.setPower(com.qualcomm.robotcore.util.Range.clip((v4), -power, power));
 
             // Control which direction is forward and which is backward from the driver POV
-            if (gamepad1.y && (currentTime.time() - buttonPress) > 0.3) {
+            if (gamepad1.y && (currentTime.time() - buttonPress) > robot.buttonTimeout) {
                 if (theta2 == 180) {
                     theta2 = 0;
                 } else {
@@ -74,19 +76,26 @@ public class MecanumTeleOp extends LinearOpMode {
                 buttonPress = currentTime.time();
             }   // end if (gamepad1.x && ...)
 
-            if(gamepad1.right_trigger>0.1){
+            if (gamepad1.right_trigger > 0.1&&robot.motorLift.getCurrentPosition()<=robot.liftMax) {
                 robot.motorLift.setPower(gamepad1.right_trigger);
-            } else if (gamepad1.left_trigger >0.1) {
+            } else if (gamepad1.left_trigger > 0.1&&robot.motorLift.getCurrentPosition()>=robot.liftMin) {
                 robot.motorLift.setPower(-gamepad1.left_trigger);
             } else robot.motorLift.setPower(0);
 
-            if(gamepad1.a){
-                robot.servoGrabber.setPosition(0.3);
+            if(gamepad1.a&&(currentTime.time() - buttonPress) > robot.buttonTimeout){
+                clawOpen=!clawOpen;
+                buttonPress = currentTime.time();
             }
-            if(gamepad1.b) {
-                robot.servoGrabber.setPosition(0.55);
+
+            if (clawOpen) {
+                robot.servoGrabber.setPosition(robot.clawOpen);
+            } else {
+                robot.servoGrabber.setPosition(robot.clawClosed);
             }
+
+
             // Provide user feedback
+            telemetry.addData("lift position:", robot.motorLift.getCurrentPosition());
             telemetry.addData("V1 = ", v1);
             telemetry.addData("V2 = ", v2);
             telemetry.addData("V3 = ", v3);
