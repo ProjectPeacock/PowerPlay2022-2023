@@ -50,10 +50,10 @@ public class HWProfile {
         motorLR = hwMap.get(DcMotor.class, "motorLR");
         motorRF = hwMap.get(DcMotor.class, "motorRF");
         motorRR = hwMap.get(DcMotor.class, "motorRR");
-        motorLF.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
-        motorLR.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
-        motorRF.setDirection(DcMotor.Direction.FORWARD);
-        motorRR.setDirection(DcMotor.Direction.FORWARD);
+        motorLF.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
+        motorLR.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
+        motorRF.setDirection(DcMotor.Direction.REVERSE);
+        motorRR.setDirection(DcMotor.Direction.REVERSE);
         motorLF.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorLR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motorRF.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

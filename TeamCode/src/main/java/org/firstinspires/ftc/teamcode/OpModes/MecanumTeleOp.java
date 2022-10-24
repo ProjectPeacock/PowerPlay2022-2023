@@ -16,7 +16,7 @@ public class MecanumTeleOp extends LinearOpMode {
     public void runOpMode() {
         double v1, v2, v3, v4, robotAngle;
         double theta;
-        double theta2 = 0;
+        double theta2 = 180;
         double r;
         double power = 0.5;
         double rightX, rightY;
@@ -53,7 +53,7 @@ public class MecanumTeleOp extends LinearOpMode {
 
             robotAngle = Math.atan2(gamepad1.left_stick_y, (-gamepad1.left_stick_x)) - Math.PI / 4;
             rightX = gamepad1.right_stick_x;
-            rightY = -gamepad1.right_stick_y;
+            rightY = gamepad1.right_stick_y;
             r = -Math.hypot(gamepad1.left_stick_x, -gamepad1.left_stick_y);
 
             v1 = (r * Math.cos(robotAngle - Math.toRadians(theta + theta2)) + rightX + rightY);
