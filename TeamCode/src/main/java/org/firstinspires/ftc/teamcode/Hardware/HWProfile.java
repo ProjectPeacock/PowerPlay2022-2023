@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Hardware;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -46,10 +47,10 @@ public class HWProfile {
 //        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)sensorDistance;
 
         // Define and Initialize Motors
-        motorLF = hwMap.get(DcMotor.class, "motorLF");
-        motorLR = hwMap.get(DcMotor.class, "motorLR");
-        motorRF = hwMap.get(DcMotor.class, "motorRF");
-        motorRR = hwMap.get(DcMotor.class, "motorRR");
+        motorLF = hwMap.get(DcMotorEx.class, "motorLF");
+        motorLR = hwMap.get(DcMotorEx.class, "motorLR");
+        motorRF = hwMap.get(DcMotorEx.class, "motorRF");
+        motorRR = hwMap.get(DcMotorEx.class, "motorRR");
         motorLF.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
         motorLR.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
         motorRF.setDirection(DcMotor.Direction.REVERSE);
