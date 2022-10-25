@@ -18,7 +18,7 @@ public class MecanumTeleOp extends LinearOpMode {
         double theta;
         double theta2 = 180;
         double r;
-        double power = 0.5;
+        double power = 1;
         double rightX, rightY;
         boolean TSEFlag = false;
         boolean fieldCentric = false;
