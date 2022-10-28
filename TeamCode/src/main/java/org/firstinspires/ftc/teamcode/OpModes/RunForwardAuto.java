@@ -21,7 +21,7 @@ public class RunForwardAuto extends LinearOpMode {
         double power=0.5;
         double rightX, rightY;
         boolean TSEFlag = false;
-        boolean fieldCentric = false;
+        boolean fieldCentric = true;
         int targetPosition = 0;
         double cupPosition = 0;
 

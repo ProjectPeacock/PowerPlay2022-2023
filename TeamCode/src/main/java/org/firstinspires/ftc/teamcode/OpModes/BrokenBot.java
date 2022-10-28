@@ -7,9 +7,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Hardware.HWProfile;
 
-@TeleOp(name = "Teleop Mode", group = "Competition")
+@TeleOp(name = "Broken Bot", group = "Competition")
 
-public class MecanumTeleOp extends LinearOpMode {
+public class BrokenBot extends LinearOpMode {
     private final static HWProfile robot = new HWProfile();
 
     @Override
@@ -46,7 +46,7 @@ public class MecanumTeleOp extends LinearOpMode {
              ****** Mecanum Drive Control section ******
              *******************************************/
             if (fieldCentric) {             // verify that the user hasn't disabled field centric drive
-                theta = robot.imu.getAngularOrientation().firstAngle - 90;
+                theta = robot.imu.getAngularOrientation().thirdAngle - 90;
             } else {
                 theta = 0;      // do not adjust for the angular position of the robot
             }
@@ -106,10 +106,9 @@ public class MecanumTeleOp extends LinearOpMode {
             telemetry.addData("V2 = ", v2);
             telemetry.addData("V3 = ", v3);
             telemetry.addData("V4 = ", v4);
-            telemetry.addData("Robot Angle = ", robotAngle);
             telemetry.addData("IMU First Angle = ", robot.imu.getAngularOrientation().firstAngle);
             telemetry.addData("IMU Second Angle = ", robot.imu.getAngularOrientation().secondAngle);
-            telemetry.addData("IMU Third Angle = ", robot.imu.getAngularOrientation().thirdAngle);
+            telemetry.addData("IMU Third Angle = ", robot.imu.getAngularOrientation().firstAngle);
             telemetry.addData("dpad_up = ", gamepad1.dpad_up);
             telemetry.addData("dpad_down = ", gamepad1.dpad_down);
             telemetry.addData("dpad_left = ", gamepad1.dpad_left);

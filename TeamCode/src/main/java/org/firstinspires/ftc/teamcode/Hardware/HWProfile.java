@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class HWProfile {
     //constants
     public final double clawOpen=0.3;
-    public final double clawClosed=0.5;
+    public final double clawClosed=0.55;
 
     public final int liftMax=10000;
     public final int liftMin=0;
