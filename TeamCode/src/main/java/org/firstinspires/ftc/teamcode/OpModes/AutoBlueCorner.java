@@ -134,7 +134,7 @@ public class AutoBlueCorner extends LinearOpMode {
             // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
             // should be set to the value of the images used to create the TensorFlow Object Detection model
             // (typically 16/9).
-            tfod.setZoom(2.0, 16.0/9.0);
+            tfod.setZoom(1.0, 16.0/9.0);
         }
 
         /** Wait for the game to begin */
@@ -205,7 +205,7 @@ public class AutoBlueCorner extends LinearOpMode {
 
                 case PARK:
 
-                    if(position == 1) {
+                    if(position == 3) {
                         // drive to park position 1
                         drive.driveDistance(0.25, 0,2);
                         drive.driveDistance(0.25, 90, 30);
@@ -272,7 +272,7 @@ public class AutoBlueCorner extends LinearOpMode {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
             "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.75f;
+        tfodParameters.minResultConfidence = 0.60f;
         tfodParameters.isModelTensorFlow2 = true;
         tfodParameters.inputSize = 300;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);

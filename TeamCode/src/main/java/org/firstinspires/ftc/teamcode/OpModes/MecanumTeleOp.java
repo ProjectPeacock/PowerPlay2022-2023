@@ -18,7 +18,7 @@ public class MecanumTeleOp extends LinearOpMode {
         double theta;
         double theta2 = 180;
         double r;
-        double power = .6;
+        double power = robot.power;
         double rightX, rightY;
         boolean TSEFlag = false;
         boolean fieldCentric = false;
@@ -41,6 +41,11 @@ public class MecanumTeleOp extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+            if(gamepad1.right_trigger>0.1&&gamepad1.right_trigger<0.8) {
+                power*=0.5;
+            }else if(gamepad1.right_trigger<0.1){
+                power=robot.power;
+            }
 
             /*******************************************
              ****** Mecanum Drive Control section ******
@@ -69,7 +74,7 @@ public class MecanumTeleOp extends LinearOpMode {
             /*if (gamepad1.right_trigger > 0.1&&power < 1) {
                 power +=.05;
             } else if (gamepad1.left_trigger > 0.1&&power > 0) {
-                power -= 0.5;
+                power -= 0.05;
             } */
 
             // Control which direction is forward and which is backward from the driver POV
@@ -84,7 +89,8 @@ public class MecanumTeleOp extends LinearOpMode {
 
             if (gamepad2.right_trigger > 0.1&&robot.motorLift.getCurrentPosition()<=robot.liftMax) {
                 robot.motorLift.setPower(gamepad2.right_trigger);
-            } else if (gamepad2.left_trigger > 0.1&&robot.motorLift.getCurrentPosition()>=robot.liftMin) {
+            } else if (gamepad2.left_trigger > 0.1) {
+//            } else if (gamepad2.left_trigger > 0.1&&robot.motorLift.getCurrentPosition()>=robot.liftMin) {
                 robot.motorLift.setPower(-gamepad2.left_trigger);
             } else robot.motorLift.setPower(0);
 
@@ -102,6 +108,7 @@ public class MecanumTeleOp extends LinearOpMode {
 
             // Provide user feedback
             telemetry.addData("lift position:", robot.motorLift.getCurrentPosition());
+            telemetry.addData("power",power);
             telemetry.addData("V1 = ", v1);
             telemetry.addData("V2 = ", v2);
             telemetry.addData("V3 = ", v3);

@@ -15,6 +15,8 @@ public class HWProfile {
     public final double clawOpen=0.3;
     public final double clawClosed=0.55;
 
+    public final double power=1;
+
     public final int liftMax=10000;
     public final int liftMin=0;
 
