@@ -31,7 +31,6 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -41,7 +40,6 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.Hardware.HWProfile;
 import org.firstinspires.ftc.teamcode.Libs.DriveClass;
 
-import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -54,9 +52,9 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@Autonomous(name = "Auto", group = "Concept")
+@Autonomous(name = "Auto: Red Corner", group = "Concept")
 
-public class AutoMode extends LinearOpMode {
+public class AutoRedCorner extends LinearOpMode {
 
     /*
      * Specify the source for the Tensor Flow Model.
@@ -195,6 +193,8 @@ public class AutoMode extends LinearOpMode {
                 case SCORE_CORNER:
                     drive.driveDistance(0.25, 180, 2);
                     drive.PIDRotate(-90, 2);
+                    sleep(500);
+                    drive.PIDRotate(-90, 2);
                     drive.driveSimpleDistance(0.25, 180,25);
 
                     sleep(1000);
@@ -222,8 +222,10 @@ public class AutoMode extends LinearOpMode {
                         drive.driveDistance(0.25, -90, 24);
                     }
                     drive.PIDRotate(0, 2);
+                    sleep(500);
+                    drive.PIDRotate(0, 2);
 
-                        autoState = State.HALT;
+                    autoState = State.HALT;
 
                     break;
 
