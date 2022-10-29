@@ -20,6 +20,9 @@ public class HWProfile {
 
     public final double buttonTimeout=0.5;
 
+    final public double DRIVE_TICKS_PER_INCH = 31;
+    final public double USD_COUNTS_PER_INCH = 31;
+
     /* Public OpMode members. */
     public DcMotor motorLF   = null;
     public DcMotor  motorLR  = null;
