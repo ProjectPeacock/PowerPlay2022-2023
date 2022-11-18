@@ -112,7 +112,7 @@ public class BrokenBot extends LinearOpMode {
             telemetry.addData("V4 = ", v4);
             telemetry.addData("IMU First Angle = ", robot.imu.getAngularOrientation().firstAngle);
             telemetry.addData("IMU Second Angle = ", robot.imu.getAngularOrientation().secondAngle);
-            telemetry.addData("IMU Third Angle = ", robot.imu.getAngularOrientation().firstAngle);
+            telemetry.addData("IMU Third Angle = ", robot.imu.getAngularOrientation().thirdAngle);
             telemetry.addData("dpad_up = ", gamepad1.dpad_up);
             telemetry.addData("dpad_down = ", gamepad1.dpad_down);
             telemetry.addData("dpad_left = ", gamepad1.dpad_left);

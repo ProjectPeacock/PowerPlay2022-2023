@@ -7,9 +7,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Hardware.HWProfile;
 
-@TeleOp(name = "Teleop Mode", group = "Competition")
+@TeleOp(name = "Single Driver Teleop Mode", group = "Competition")
 
-public class MecanumTeleOp extends LinearOpMode {
+public class SingleDriverTeleop extends LinearOpMode {
     private final static HWProfile robot = new HWProfile();
 
     @Override
@@ -21,7 +21,7 @@ public class MecanumTeleOp extends LinearOpMode {
         double power = robot.power;
         double rightX, rightY;
         boolean TSEFlag = false;
-        boolean fieldCentric = true;
+        boolean fieldCentric = false;
         int targetPosition = 0;
         double cupPosition = 0;
 
@@ -33,8 +33,8 @@ public class MecanumTeleOp extends LinearOpMode {
         telemetry.addData("Ready to Run: ", "GOOD LUCK");
         telemetry.update();
 
-        boolean shippingElement = true;
-        boolean armDeployed = true;
+        boolean shippingElement = false;
+        boolean armDeployed = false;
 
         boolean clawOpen = true;
 
@@ -51,13 +51,13 @@ public class MecanumTeleOp extends LinearOpMode {
              ****** Mecanum Drive Control section ******
              *******************************************/
             if (fieldCentric) {             // verify that the user hasn't disabled field centric drive
-                theta = robot.imu.getAngularOrientation().firstAngle - 0;
+                theta = robot.imu.getAngularOrientation().firstAngle - 90;
             } else {
                 theta = 0;      // do not adjust for the angular position of the robot
             }
 
             robotAngle = Math.atan2(gamepad1.left_stick_y, (-gamepad1.left_stick_x)) - Math.PI / 4;
-            rightX = gamepad1.right_stick_x;
+            rightX = gamepad1.right_stick_x*0.5;
             rightY = gamepad1.right_stick_y;
             r = -Math.hypot(gamepad1.left_stick_x, -gamepad1.left_stick_y);
 
@@ -87,11 +87,11 @@ public class MecanumTeleOp extends LinearOpMode {
                 buttonPress = currentTime.time();
             }   // end if (gamepad1.x && ...)
 
-            if (gamepad2.right_trigger > 0.1&&robot.motorLift.getCurrentPosition()<=robot.liftMax) {
-                robot.motorLift.setPower(gamepad2.right_trigger);
-            } else if (gamepad2.left_trigger > 0.1) {
+            if (gamepad1.right_trigger > 0.1&&robot.motorLift.getCurrentPosition()<=robot.liftMax) {
+                robot.motorLift.setPower(gamepad1.right_trigger);
+            } else if (gamepad1.left_trigger > 0.1) {
 //            } else if (gamepad2.left_trigger > 0.1&&robot.motorLift.getCurrentPosition()>=robot.liftMin) {
-                robot.motorLift.setPower(-gamepad2.left_trigger);
+                robot.motorLift.setPower(-gamepad1.left_trigger);
             } else robot.motorLift.setPower(0);
 
             if(gamepad1.a&&(currentTime.time() - buttonPress) > robot.buttonTimeout){

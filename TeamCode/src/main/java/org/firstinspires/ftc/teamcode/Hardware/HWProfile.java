@@ -17,7 +17,7 @@ public class HWProfile {
 
     public final double power=1;
 
-    public final int liftMax=10000;
+    public final int liftMax=4300;
     public final int liftMin=0;
 
     public final double buttonTimeout=0.5;
