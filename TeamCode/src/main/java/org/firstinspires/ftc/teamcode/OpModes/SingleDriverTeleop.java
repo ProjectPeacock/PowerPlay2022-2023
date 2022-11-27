@@ -18,7 +18,7 @@ public class SingleDriverTeleop extends LinearOpMode {
         double theta;
         double theta2 = 180;
         double r;
-        double power = robot.power;
+        double power = robot.MAX_DRIVE_POWER;
         double rightX, rightY;
         boolean TSEFlag = false;
         boolean fieldCentric = false;
@@ -44,7 +44,7 @@ public class SingleDriverTeleop extends LinearOpMode {
             if(gamepad1.right_trigger>0.1&&gamepad1.right_trigger<0.8) {
                 power*=0.5;
             }else if(gamepad1.right_trigger<0.1){
-                power=robot.power;
+                power=robot.MAX_DRIVE_POWER;
             }
 
             /*******************************************
@@ -78,7 +78,7 @@ public class SingleDriverTeleop extends LinearOpMode {
             } */
 
             // Control which direction is forward and which is backward from the driver POV
-            if (gamepad1.y && (currentTime.time() - buttonPress) > robot.buttonTimeout) {
+            if (gamepad1.y && (currentTime.time() - buttonPress) > robot.BUTTON_TIMEOUT) {
                 if (theta2 == 180) {
                     theta2 = 0;
                 } else {
@@ -87,22 +87,22 @@ public class SingleDriverTeleop extends LinearOpMode {
                 buttonPress = currentTime.time();
             }   // end if (gamepad1.x && ...)
 
-            if (gamepad1.right_trigger > 0.1&&robot.motorLift.getCurrentPosition()<=robot.liftMax) {
+            if (gamepad1.right_trigger > 0.1&&robot.motorLift.getCurrentPosition()<=robot.MAX_LIFT_VALUE) {
                 robot.motorLift.setPower(gamepad1.right_trigger);
             } else if (gamepad1.left_trigger > 0.1) {
 //            } else if (gamepad2.left_trigger > 0.1&&robot.motorLift.getCurrentPosition()>=robot.liftMin) {
                 robot.motorLift.setPower(-gamepad1.left_trigger);
             } else robot.motorLift.setPower(0);
 
-            if(gamepad1.a&&(currentTime.time() - buttonPress) > robot.buttonTimeout){
+            if(gamepad1.a&&(currentTime.time() - buttonPress) > robot.BUTTON_TIMEOUT){
                 clawOpen=!clawOpen;
                 buttonPress = currentTime.time();
             }
 
             if (clawOpen) {
-                robot.servoGrabber.setPosition(robot.clawOpen);
+                robot.servoGrabber.setPosition(robot.CLAW_OPEN);
             } else {
-                robot.servoGrabber.setPosition(robot.clawClosed);
+                robot.servoGrabber.setPosition(robot.CLAW_CLOSE);
             }
 
 

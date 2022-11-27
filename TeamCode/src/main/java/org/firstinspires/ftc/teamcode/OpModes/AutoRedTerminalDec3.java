@@ -52,9 +52,9 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@Autonomous(name = "Auto: Red Corner - Dec 3rd", group = "Concept")
+@Autonomous(name = "Auto: Red Terminal Dec 3rd", group = "Competition")
 
-public class AutoRedCornerDec3 extends LinearOpMode {
+public class AutoRedTerminalDec3 extends LinearOpMode {
 
     /*
      * Specify the source for the Tensor Flow Model.
@@ -218,7 +218,7 @@ public class AutoRedCornerDec3 extends LinearOpMode {
                     break;
 
                 case RETRIEVE_CONE2:
-  //                  drive.PIDRotate(0, 2);
+                    //                  drive.PIDRotate(0, 2);
 
                     // push signal cone out of the way
                     drive.driveDistance(0.3, 0, 75);
@@ -226,17 +226,18 @@ public class AutoRedCornerDec3 extends LinearOpMode {
                     // back up to turn towards cone stack
                     drive.driveDistance(0.3, 180, 3);
 
-                    // turn towards cone stack
-                    drive.PIDRotate(-84, 2);
-                    drive.PIDRotate(-88, 2);
-
                     // raise lift to appropriate height
-                    drive.liftRaise(775);
+                    drive.liftPosition(775);
 
-                    sleep(500);
+                    // turn towards cone stack
+                    drive.PIDRotate(-90, 2);
+                    drive.driveDistance(0.4, 0, 14);
+
+                    // realign the robot
+                    drive.PIDRotate(-90, 2);
 
                     // drive towards cones
-                    drive.driveDistance(0.4, 0, 28);
+                    drive.driveDistance(0.4, 0, 14);
 
                     drive.closeClaw();
                     sleep(500);
@@ -259,7 +260,8 @@ public class AutoRedCornerDec3 extends LinearOpMode {
 //                    drive.driveDistance(0.3, 0, 4);
 
                     // lower the lift
-                    drive.liftRaise(675);
+                    drive.liftPosition(675);
+                    sleep(400);
 
                     // open claw and drive backwards
                     drive.openClaw();
@@ -272,8 +274,13 @@ public class AutoRedCornerDec3 extends LinearOpMode {
                     break;
 
                 case RETRIEVE_CONE3:
+                    // align robot towards the cones
+                    drive.PIDRotate(-90, 2);
+
+                    // drive towards the cone stack to grab another
                     drive.driveDistance(0.3, 0, 30);
 
+                    // close the claw around the cone
                     drive.closeClaw();
                     sleep(500);
 
@@ -294,40 +301,31 @@ public class AutoRedCornerDec3 extends LinearOpMode {
 
                     sleep(500);
 
+                    // rotate towards the high goal
                     drive.PIDRotate(0, 2);
 
+                    // position in scoring position
                     drive.driveDistance(0.3, 0, 3);
                     drive.driveDistance(0.3, 180, 2);
 
-                    drive.liftRaise(600);
+                    // lower the lift to place the cone
+                    drive.liftPosition(600);
                     sleep(1000);
 
+                    // open the claw to release the cone
                     drive.openClaw();
 
-
+                    // raise the lift to avoid entangling with the junction
                     drive.liftHighJunction();
                     sleep(1000);
 
-                    drive.driveDistance(0.3, 180, 2);
+                    // back away from the junction to allow room for turning
+                    drive.driveDistance(0.2, 180, 1);
 
+                    // turn towards the cone stack to retrieve another cone or park
                     drive.PIDRotate(-90, 2);
-                    drive.liftRaise(600);
+                    drive.liftPosition(600);
                     sleep(500);
-
-                    drive.driveDistance(0.4, 0, 43);
-
-                    autoState = State.HALT;
-                    break;
-
-                case SCORE_CORNER:
-                    drive.driveDistance(0.25, 180, 2);
-                    drive.PIDRotate(-90, 2);
-                    sleep(500);
-                    drive.PIDRotate(-90, 2);
-                    drive.driveSimpleDistance(0.25, 180,25);
-
-                    sleep(1000);
-                    robot.servoGrabber.setPosition(robot.clawOpen);
 
                     autoState = State.PARK;
                     break;
@@ -335,24 +333,49 @@ public class AutoRedCornerDec3 extends LinearOpMode {
                 case PARK:
 
                     if(position == 1) {
-                        // drive to park position 1
-                        drive.driveDistance(0.25, 0,2);
-                        drive.driveDistance(0.25, -90, 30);
-                        drive.driveDistance(0.25, 180,3);
+                        // reset the lift
+                        drive.liftReset();
+                        drive.openClaw();
 
+                        // rotate towards the park 1 position
+                        drive.PIDRotate(-90, 2);
+
+                        // drive to park position 1
+                        drive.driveDistance(0.3, 0,36);
+
+                        // rotate into position for field centric drive
+                        drive.PIDRotate(0,2);
                     } else if (position == 2) {
-                        // drive to park position 2
-                        drive.driveDistance(0.25, 0, 22);
-                        drive.driveDistance(0.25, -90, 24);
-//                        drive.driveDistance(0.25, 180,3);
+                        // reset the lift
+                        drive.liftReset();
+                        drive.openClaw();
+
+                        // rotate towards the outside wall position
+                        drive.PIDRotate(-90, 2);
+
+                        // drive to park position 1
+                        drive.driveDistance(0.3, 0,15);
+
+                        // rotate into position for field centric drive
+                        drive.PIDRotate(0,2);
                     } else {
-                        // drive to park position 3
-                        drive.driveDistance(0.25, 0, 48);
-                        drive.driveDistance(0.25, -90, 24);
+                        // reset the lift
+                        drive.liftReset();
+                        drive.openClaw();
+
+                        // rotate towards the outside wall position
+                        drive.PIDRotate(-90, 2);
+
+                        // drive to park position 1
+                        drive.driveDistance(0.3, 180,15);
+
+                        // rotate into position for field centric drive
+                        drive.PIDRotate(0,2);
                     }
-                    drive.PIDRotate(0, 2);
-                    sleep(500);
-                    drive.PIDRotate(0, 2);
+
+                    while(opModeIsActive() && robot.motorLift.getCurrentPosition() > 10){
+                        drive.liftReset();
+                    }
 
                     autoState = State.HALT;
 
@@ -362,6 +385,8 @@ public class AutoRedCornerDec3 extends LinearOpMode {
 
                     // Stop all motors
                     drive.motorsHalt();
+                    robot.motorLift.setPower(0);
+                    drive.openClaw();
 
                     // End the program
                     requestOpModeStop();
@@ -391,7 +416,7 @@ public class AutoRedCornerDec3 extends LinearOpMode {
     }
 
     enum State {
-        TEST, DETECT_CONE, SCORE_LOW, RETRIEVE_CONE2, SCORE_JUNCTION2, RETRIEVE_CONE3, SCORE_CONE3, SCORE_CORNER, PARK, HALT;
+        TEST, DETECT_CONE, SCORE_LOW, RETRIEVE_CONE2, SCORE_JUNCTION2, RETRIEVE_CONE3, SCORE_CONE3, SCORE_CORNER, PARK, PARK2, HALT;
     }   // end of enum State
 
     /**
@@ -399,7 +424,7 @@ public class AutoRedCornerDec3 extends LinearOpMode {
      */
     private void initTfod() {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-            "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
         tfodParameters.minResultConfidence = 0.6f;
         tfodParameters.isModelTensorFlow2 = true;

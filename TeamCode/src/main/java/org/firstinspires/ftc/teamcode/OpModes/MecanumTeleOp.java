@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Hardware.HWProfile;
 
@@ -18,12 +19,10 @@ public class MecanumTeleOp extends LinearOpMode {
         double theta;
         double theta2 = 180;
         double r;
-        double power = robot.power;
+        double power = robot.MAX_DRIVE_POWER;
         double rightX, rightY;
-        boolean TSEFlag = false;
         boolean fieldCentric = true;
-        int targetPosition = 0;
-        double cupPosition = 0;
+        int liftPosition = 0;
 
         ElapsedTime currentTime = new ElapsedTime();
         double buttonPress = currentTime.time();
@@ -41,10 +40,12 @@ public class MecanumTeleOp extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+
+            // give drive the ability to adjust the max speed of the robot
             if(gamepad1.right_trigger>0.1&&gamepad1.right_trigger<0.8) {
                 power*=0.5;
             }else if(gamepad1.right_trigger<0.1){
-                power=robot.power;
+                power=robot.MAX_DRIVE_POWER;
             }
 
             /*******************************************
@@ -71,64 +72,50 @@ public class MecanumTeleOp extends LinearOpMode {
             robot.motorLR.setPower(com.qualcomm.robotcore.util.Range.clip((v3), -power, power));
             robot.motorRR.setPower(com.qualcomm.robotcore.util.Range.clip((v4), -power, power));
 
-            /*if (gamepad1.right_trigger > 0.1&&power < 1) {
-                power +=.05;
-            } else if (gamepad1.left_trigger > 0.1&&power > 0) {
-                power -= 0.05;
-            } */
-
             // Control which direction is forward and which is backward from the driver POV
-            if (gamepad1.y && (currentTime.time() - buttonPress) > robot.buttonTimeout) {
+            if (gamepad1.y && (currentTime.time() - buttonPress) > robot.BUTTON_TIMEOUT) {
                 if (theta2 == 180) {
                     theta2 = 0;
                 } else {
                     theta2 = 180;
                 }
                 buttonPress = currentTime.time();
-            }   // end if (gamepad1.x && ...)
+            }   // end if (gamepad1.y && ...)
 
-            if (gamepad2.right_trigger > 0.1&&robot.motorLift.getCurrentPosition()<=robot.liftMax) {
-                robot.motorLift.setPower(gamepad2.right_trigger);
-            } else if (gamepad2.left_trigger > 0.1) {
-//            } else if (gamepad2.left_trigger > 0.1&&robot.motorLift.getCurrentPosition()>=robot.liftMin) {
-                robot.motorLift.setPower(-gamepad2.left_trigger);
-            } else robot.motorLift.setPower(0);
 
-            if(gamepad1.a&&(currentTime.time() - buttonPress) > robot.buttonTimeout){
+            /*
+             * #############################################################
+             * #################### CLAW CONTROL ###########################
+             * #############################################################
+             */
+            if(gamepad1.a&&(currentTime.time() - buttonPress) > robot.BUTTON_TIMEOUT){
                 clawOpen=!clawOpen;
                 buttonPress = currentTime.time();
             }
 
             if (clawOpen) {
-                robot.servoGrabber.setPosition(robot.clawOpen);
+                robot.servoGrabber.setPosition(robot.CLAW_OPEN);
             } else {
-                robot.servoGrabber.setPosition(robot.clawClosed);
+                robot.servoGrabber.setPosition(robot.CLAW_CLOSE);
             }
 
+            /*
+             * #############################################################
+             * #################### LIFT CONTROL ###########################
+             * #############################################################
+             */
+            if (gamepad2.right_trigger > 0.1 && robot.motorLift.getCurrentPosition()<=robot.MAX_LIFT_VALUE) {
+                liftPosition = liftPosition + 1;
+            } else if (gamepad2.left_trigger > 0.1 && robot.motorLift.getCurrentPosition() >= robot.MIN_LIFT_VALUE) {
+                liftPosition = liftPosition - 1;
+            } else robot.motorLift.setPower(0);
 
-            // Provide user feedback
-            telemetry.addData("lift position:", robot.motorLift.getCurrentPosition());
-            telemetry.addData("power",power);
-            telemetry.addData("V1 = ", v1);
-            telemetry.addData("V2 = ", v2);
-            telemetry.addData("V3 = ", v3);
-            telemetry.addData("V4 = ", v4);
-            telemetry.addData("Robot Angle = ", robotAngle);
-            telemetry.addData("IMU First Angle = ", robot.imu.getAngularOrientation().firstAngle);
-            telemetry.addData("IMU Second Angle = ", robot.imu.getAngularOrientation().secondAngle);
-            telemetry.addData("IMU Third Angle = ", robot.imu.getAngularOrientation().thirdAngle);
-            telemetry.addData("dpad_up = ", gamepad1.dpad_up);
-            telemetry.addData("dpad_down = ", gamepad1.dpad_down);
-            telemetry.addData("dpad_left = ", gamepad1.dpad_left);
-            telemetry.addData("dpad_right = ", gamepad1.dpad_right);
-            telemetry.addData("Left Stick X = ", gamepad1.left_stick_x);
-            telemetry.addData("Left Stick Y = ", gamepad1.left_stick_y);
-            telemetry.addData("Right Stick X = ", gamepad1.right_stick_x);
-            telemetry.addData("Right Stick Y = ", gamepad1.right_stick_y);
-            telemetry.addData("Theta = ", theta);
-            telemetry.addData("Theta2 = ", theta);
-            telemetry.addData("IMU Value: ", theta);
-            telemetry.update();
+            // limit the values of liftPosition => This shouldn't be necessary if logic above works
+            Range.clip(liftPosition, robot.MIN_LIFT_VALUE, robot.MAX_LIFT_VALUE);
+
+            // move lift to target position
+            robot.motorLift.setTargetPosition(liftPosition);
+            robot.motorLift.setPower(1);
 
         }   // end of while(opModeIsActive)
     }   // end of runOpMode()

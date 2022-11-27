@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Hardware.HWProfile;
 
@@ -20,10 +21,8 @@ public class BrokenBot extends LinearOpMode {
         double r;
         double power = .6;
         double rightX, rightY;
-        boolean TSEFlag = false;
         boolean fieldCentric = false;
-        int targetPosition = 0;
-        double cupPosition = 0;
+        int liftPosition = 0;
 
         ElapsedTime currentTime = new ElapsedTime();
         double buttonPress = currentTime.time();
@@ -46,12 +45,12 @@ public class BrokenBot extends LinearOpMode {
              ****** Mecanum Drive Control section ******
              *******************************************/
             if (fieldCentric) {             // verify that the user hasn't disabled field centric drive
-                theta = robot.imu.getAngularOrientation().thirdAngle - 90;
+                theta = robot.imu.getAngularOrientation().firstAngle - 0;
             } else {
                 theta = 0;      // do not adjust for the angular position of the robot
             }
 
-            robotAngle = Math.atan2(-gamepad1.left_stick_y, (-gamepad1.left_stick_x)) - Math.PI / 4;
+            robotAngle = -(Math.atan2(gamepad1.left_stick_y, (-gamepad1.left_stick_x)) - Math.PI / 4);
             rightX = -gamepad1.right_stick_x;
             rightY = -gamepad1.right_stick_y;
             r = -Math.hypot(gamepad1.left_stick_x, -gamepad1.left_stick_y);
@@ -75,14 +74,8 @@ public class BrokenBot extends LinearOpMode {
             robot.motorLR.setPower(com.qualcomm.robotcore.util.Range.clip((v3), -power, power));
             robot.motorRR.setPower(com.qualcomm.robotcore.util.Range.clip((v4), -power, power));
 
-            /*if (gamepad1.right_trigger > 0.1&&power < 1) {
-                power +=.05;
-            } else if (gamepad1.left_trigger > 0.1&&power > 0) {
-                power -= 0.5;
-            } */
-
             // Control which direction is forward and which is backward from the driver POV
-            if (gamepad1.y && (currentTime.time() - buttonPress) > robot.buttonTimeout) {
+            if (gamepad1.y && (currentTime.time() - buttonPress) > robot.BUTTON_TIMEOUT) {
                 if (theta2 == 180) {
                     theta2 = 0;
                 } else {
@@ -91,21 +84,33 @@ public class BrokenBot extends LinearOpMode {
                 buttonPress = currentTime.time();
             }   // end if (gamepad1.x && ...)
 
-            if (gamepad2.right_trigger > 0.1&&robot.motorLift.getCurrentPosition()<=robot.liftMax) {
-                robot.motorLift.setPower(gamepad2.right_trigger);
-            } else if (gamepad2.left_trigger > 0.1&&robot.motorLift.getCurrentPosition()>=robot.liftMin) {
-                robot.motorLift.setPower(-gamepad2.left_trigger);
+            /*
+             * #############################################################
+             * #################### LIFT CONTROL ###########################
+             * #############################################################
+             */
+            if (gamepad2.right_trigger > 0.1 && robot.motorLift.getCurrentPosition()<=robot.MAX_LIFT_VALUE) {
+                liftPosition = liftPosition + 1;
+            } else if (gamepad2.left_trigger > 0.1 && robot.motorLift.getCurrentPosition() >= robot.MIN_LIFT_VALUE) {
+                liftPosition = liftPosition - 1;
             } else robot.motorLift.setPower(0);
 
-            if(gamepad1.a&&(currentTime.time() - buttonPress) > robot.buttonTimeout){
+            // limit the values of liftPosition => This shouldn't be necessary if logic above works
+            Range.clip(liftPosition, robot.MIN_LIFT_VALUE, robot.MAX_LIFT_VALUE);
+
+            // move lift to target position
+            robot.motorLift.setTargetPosition(liftPosition);
+            robot.motorLift.setPower(1);
+
+            if(gamepad1.a&&(currentTime.time() - buttonPress) > robot.BUTTON_TIMEOUT){
                 clawOpen=!clawOpen;
                 buttonPress = currentTime.time();
             }
 
             if (clawOpen) {
-                robot.servoGrabber.setPosition(robot.clawOpen);
+                robot.servoGrabber.setPosition(robot.CLAW_OPEN);
             } else {
-                robot.servoGrabber.setPosition(robot.clawClosed);
+                robot.servoGrabber.setPosition(robot.CLAW_CLOSE);
             }
 
 

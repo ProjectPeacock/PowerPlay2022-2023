@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -53,6 +54,7 @@ import java.util.List;
  * is explained below.
  */
 @Autonomous(name = "Auto: Red Corner", group = "Concept")
+@Disabled
 
 public class AutoRedCorner extends LinearOpMode {
 
@@ -139,7 +141,7 @@ public class AutoRedCorner extends LinearOpMode {
 
         /** Wait for the game to begin */
 
-        robot.servoGrabber.setPosition(robot.clawClosed);
+        robot.servoGrabber.setPosition(robot.CLAW_CLOSE);
 
 
         telemetry.addData(">", "Press Play to start op mode");
@@ -198,7 +200,7 @@ public class AutoRedCorner extends LinearOpMode {
                     drive.driveSimpleDistance(0.25, 180,25);
 
                     sleep(1000);
-                    robot.servoGrabber.setPosition(robot.clawOpen);
+                    robot.servoGrabber.setPosition(robot.CLAW_OPEN);
 
                     autoState = State.PARK;
                     break;

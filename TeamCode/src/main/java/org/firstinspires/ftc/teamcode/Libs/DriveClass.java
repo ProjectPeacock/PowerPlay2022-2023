@@ -30,113 +30,6 @@ public class DriveClass {
      */
 
     /**
-     * Method robotCorrect2
-     *  -   This method is a revised version of robotCorrect. There were some behaviors that needed
-     *      to be fixed, but didn't want to risk all of the programs. This one can be renamed
-     *      robotCorrect and all instances of robotCorrect2 changed to robotCorrect.
-     * @param power
-     * @param heading
-     * @param duration
-     */
-    public void robotCorrect2(double power, double heading, double duration) {
-        String action = "Initializing";
-        double initZ = getZAngle();
-        double currentZ = 0;
-        double zCorrection = 0;
-        boolean active = true;
-        double theta = Math.toRadians(90 + heading);
-        ElapsedTime runTime = new ElapsedTime();
-
-        if(runTime.time() >= duration) active = false;
-
-        while(opMode.opModeIsActive() && active) {
-            updateValues(action, initZ, theta, currentZ, zCorrection);
-
-            RF = power * (Math.sin(theta) + Math.cos(theta));
-            LF = power * (Math.sin(theta) - Math.cos(theta));
-            LR = power * (Math.sin(theta) + Math.cos(theta));
-            RR = power * (Math.sin(theta) - Math.cos(theta));
-
-            if(runTime.time() >= duration) active = false;
-
-            currentZ = getZAngle();
-            if (currentZ != initZ){
-                zCorrection = Math.abs(initZ - currentZ)/100;
-
-                if (initZ < currentZ) {
-                    RF = RF + zCorrection;
-                    RR = RR + zCorrection;
-                    LF = LF - zCorrection;
-                    LR = LR - zCorrection;
-                    action = " initZ < currentZ";
-                }
-                if (initZ > currentZ) {
-                    RF = RF - zCorrection;
-                    RR = RR - zCorrection;
-                    LF = LF + zCorrection;
-                    LR = LR + zCorrection;
-                    action = " initZ < currentZ";
-                }
-            }   // end of if currentZ != initZ
-
-            /*
-             * Limit that value of the drive motors so that the power does not exceed 100%
-             */
-            if(RF > 1) RF = 1;
-            else if (RF < -1) RF = -1;
-
-            if(LF > 1) LF = 1;
-            else if (LF < -1) LF = -1;
-
-            if(LR > 1) LR = 1;
-            else if (LR < -1) LR = -1;
-
-            if(RR > 1) RR = 1;
-            else if (RR < -1) RR = -1;
-
-            /*
-             * Apply power to the drive wheels
-             */
-            setDrivePower(RF, LF, LR, RR);
-
-        }   // end of while loop
-
-        motorsHalt();
-    }   // close robotCorrect method
-
-    public void liftRaise(int position){
-        robot.motorLift.setTargetPosition(position);
-        robot.motorLift.setPower((1));
-    }
-
-    public void liftReset(){
-        robot.motorLift.setTargetPosition(0);
-        robot.motorLift.setPower((0.5));
-    }
-
-    public void liftLowerJunction(){
-        robot.motorLift.setTargetPosition(robot.JUNCTION_LOWER);
-        robot.motorLift.setPower(1);
-    }
-
-    public void liftMidJunction(){
-        robot.motorLift.setTargetPosition(robot.JUNCTION_MID);
-        robot.motorLift.setPower(1);
-    }
-
-    public void liftHighJunction(){
-        robot.motorLift.setTargetPosition(robot.JUNCTION_HIGH);
-        robot.motorLift.setPower(1);
-    }
-
-    public void openClaw(){
-        robot.servoGrabber.setPosition(robot.clawOpen);
-    }
-
-    public void closeClaw(){
-        robot.servoGrabber.setPosition(robot.clawClosed);
-    }
-    /**
      *  Method: driveDistance
      *  -   uses the encoder values to determine distance traveled.
      *  -   This method will autocorrect the position of the robot if it drifts off its position
@@ -206,11 +99,13 @@ public class DriveClass {
              */
             setDrivePower(RF, LF, LR, RR);
 
+            /*
             opMode.telemetry.addData("LF Start = ", lfStart);
             opMode.telemetry.addData("Distance = ", distance);
             opMode.telemetry.addData("Heading = ", heading);
             opMode.telemetry.addData("Calculated Distance = ", calcDistance(heading, rfStart, rrStart, lfStart, lrStart));
             opMode.telemetry.update();
+             */
 
             if(calcDistance(heading, rfStart, rrStart, lfStart, lrStart) >= distance) active = false;
             opMode.idle();
@@ -242,11 +137,7 @@ public class DriveClass {
         double derivative = 0, deltaError, lastError=0;
 
         // check to see how far the robot is rotating to decide which gyro sensor value to use
-        if(targetAngle > 90 || targetAngle < -90){
-            error = gyro360(targetAngle) - targetAngle;
-        } else {
-            error = getZAngle() - targetAngle;
-        }
+        error = updateError(targetAngle);
 
         // nested while loops are used to allow for a final check of an overshoot situation
         while ((Math.abs(error) >= targetError) && opMode.opModeIsActive()) {
@@ -257,10 +148,11 @@ public class DriveClass {
                 // Clip motor speed
                 rotationSpeed = Range.clip(rotationSpeed, -maxSpeed, maxSpeed);
 
-                if ((rotationSpeed > -0.25) && (rotationSpeed < 0)) {
-                    rotationSpeed = -0.21;
-                } else if ((rotationSpeed < 0.25) && (rotationSpeed > 0)) {
-                    rotationSpeed = 0.21;
+                // bump the power up to min threshold if the robot doesn't have enough power to turn
+                if ((rotationSpeed > -0.15) && (rotationSpeed < 0)) {
+                    rotationSpeed = -robot.MIN_PIDROTATE_POWER;
+                } else if ((rotationSpeed < 0.15) && (rotationSpeed > 0)) {
+                    rotationSpeed = robot.MIN_PIDROTATE_POWER;
                 }
 
                 RF = -rotationSpeed;
@@ -273,6 +165,7 @@ public class DriveClass {
                 lastError = error;
                 iterations++;
 
+                /*
                 opMode.telemetry.addData("InitZ/targetAngle value  = ", targetAngle);
                 opMode.telemetry.addData("Current Angle  = ", getZAngle());
                 opMode.telemetry.addData("Theta/lastError Value= ", lastError);
@@ -284,70 +177,104 @@ public class DriveClass {
                 opMode.telemetry.addData("Left Rear = ", LR);
                 opMode.telemetry.addData("Right Rear = ", RR);
                 opMode.telemetry.update();
+                 */
 
                 // check to see how far the robot is rotating to decide which gyro sensor value to use
-                if (targetAngle > 90 || targetAngle < -90) {
-                    error = gyro360(targetAngle) - targetAngle;
-                } else {
-                    error = getZAngle() - targetAngle;
-                }
+                error = updateError(targetAngle);
 
             }   // end of while Math.abs(error)
             motorsHalt();
 
             // Perform a final calc on the error to confirm that the robot didn't overshoot the
             // target position after the last measurement was taken.
-//            opMode.sleep(5);
-            if (targetAngle > 90 || targetAngle < -90) {
-                error = gyro360(targetAngle) - targetAngle;
-            } else {
-                error = getZAngle() - targetAngle;
-            }
-        }
+            opMode.sleep(5);
+            error = updateError(targetAngle);
+        }   // close outside while loop
 
         // shut off the drive motors
         motorsHalt();
 
+        /*
         totalTime = timeElapsed.time() - startTime;
         opMode.telemetry.addData("Iterations = ", iterations);
         opMode.telemetry.addData("Final Angle = ", getZAngle());
         opMode.telemetry.addData("Total Time Elapsed = ", totalTime);
         opMode.telemetry.update();
+         */
     }   //end of the PIDRotate Method
 
     /**
-     * Method gyro360
-     *  - Causes the Gyro to behave in 360 mode instead of 180 degree mode
-     * @param targetAngle - Reference angle for the gyro sensor
+     * Method driveByTime
+     *  -   This method is a revised version of robotCorrect. There were some behaviors that needed
+     *      to be fixed, but didn't want to risk all of the programs. This one can be renamed
+     *      robotCorrect and all instances of robotCorrect2 changed to robotCorrect.
+     * @param power
+     * @param heading
+     * @param duration
      */
-    public double gyro360(double targetAngle){
-        double currentZ = getZAngle();
-        double rotationalAngle;
+    public void driveByTime(double power, double heading, double duration) {
+        String action = "Initializing";
+        double initZ = getZAngle();
+        double currentZ = 0;
+        double zCorrection = 0;
+        boolean active = true;
+        double theta = Math.toRadians(90 + heading);
+        ElapsedTime runTime = new ElapsedTime();
 
-        if (targetAngle > 0){
-            if ((currentZ >= 0) && (currentZ <= 180)) {
-                rotationalAngle = currentZ;
-            } else {
-                rotationalAngle = 180 + (180 + currentZ);
-            }// end if(currentZ <=0) - else
-        } else {
-            if ((currentZ <= 0) && (currentZ >= -180)) {
-                rotationalAngle = currentZ;
-            } else {
-                rotationalAngle = -180 - (180 - currentZ);
-            }   // end if(currentZ <=0) - else
-        }   // end if(targetAngle >0)-else
+        if(runTime.time() >= duration) active = false;
 
-        return rotationalAngle;
-    }   // end method gyro360
+        while(opMode.opModeIsActive() && active) {
+            updateValues(action, initZ, theta, currentZ, zCorrection);
+
+            // calculate power to apply to each wheel
+            RF = power * (Math.sin(theta) + Math.cos(theta));
+            LF = power * (Math.sin(theta) - Math.cos(theta));
+            LR = power * (Math.sin(theta) + Math.cos(theta));
+            RR = power * (Math.sin(theta) - Math.cos(theta));
+
+            if(runTime.time() >= duration) active = false;
+
+            currentZ = getZAngle();
+            if (currentZ != initZ){
+                zCorrection = Math.abs(initZ - currentZ)/100;
+
+                if (initZ < currentZ) {
+                    RF = RF - zCorrection;
+                    RR = RR - zCorrection;
+                    LF = LF + zCorrection;
+                    LR = LR + zCorrection;
+                }
+                if (initZ > currentZ) {
+                    RF = RF + zCorrection;
+                    RR = RR + zCorrection;
+                    LF = LF - zCorrection;
+                    LR = LR - zCorrection;
+                }
+            }   // end of if currentZ != initZ
+
+            /*
+             * Limit that value of the drive motors so that the power does not exceed 100%
+             */
+            RF = Range.clip(RF, -1,1);
+            LF = Range.clip(LF, -1,1);
+            RR = Range.clip(RR, -1,1);
+            LR = Range.clip(LR, -1,1);
+
+            /*
+             * Apply power to the drive wheels
+             */
+            setDrivePower(RF, LF, LR, RR);
+
+        }   // end of while loop
+
+        motorsHalt();
+    }   // close driveByTime method
+
 
     /**
      *  Method: driveSimpleDistance
      *  -   uses the encoder values to determine distance traveled.
-     *  -   This method will autocorrect the position of the robot if it drifts off its position
-     *  -   Note: This method uses gyro360 to measure it's angle. The reference target angle used
-     *              is 0 degrees as that ensures that the reference and measured angles always
-     *              provide consistent reporting comparisons.
+     *  -   This method will NOT autocorrect the position of the robot if it drifts off path
      * @param power     - provides the power/speed that the robot should move
      * @param heading   - direction for the robot to strafe to
      * @param distance  - amount of time that the robot will move
@@ -381,6 +308,7 @@ public class DriveClass {
     }   // close simpleDriveDistance method
 
     /**
+     *  Method: setDrivePower
      * Sets power to all four drive motors
      * @param RF power for right front motor
      * @param LF power for left front motor
@@ -394,8 +322,8 @@ public class DriveClass {
         robot.motorRR.setPower(RR);
     }   // end of the setDrivePower method
 
-    /*
-     * Method motorsHalt
+    /**
+     * Method: motorsHalt
      *  -   stops all drive motors
      */
     public void motorsHalt(){
@@ -405,6 +333,76 @@ public class DriveClass {
         robot.motorRR.setPower(0);
     }   // end of motorsHalt method
 
+    /*
+     * ###########################################################################################
+     * ###########################################################################################
+     * #######################      ARM & LIFT CONTROLS      #####################################
+     * ###########################################################################################
+     * ###########################################################################################
+     */
+
+    /**
+     * Method: liftPosition
+     *  -   raise the lift to the desired position
+     * @param position
+     */
+    public void liftPosition(int position){
+        robot.motorLift.setTargetPosition(position);
+        robot.motorLift.setPower((1));
+    }
+
+    /**
+     * Method: liftReset
+     *  -   reset the lift to starting position
+     */
+    public void liftReset(){
+        robot.motorLift.setTargetPosition(0);
+        robot.motorLift.setPower((1));
+    }
+
+    /**
+     * Method: liftLowerJunction
+     *  -   raise the lift to the lower junction level
+     */
+    public void liftLowerJunction(){
+        robot.motorLift.setTargetPosition(robot.JUNCTION_LOWER);
+        robot.motorLift.setPower(1);
+    }
+
+    /**
+     * Method: liftMidJunction
+     *  -   raise the lift to the mid junction level
+     */
+    public void liftMidJunction(){
+        robot.motorLift.setTargetPosition(robot.JUNCTION_MID);
+        robot.motorLift.setPower(1);
+    }
+
+    /**
+     * Method: liftHighJunction
+     *  -   raise the lift to the lower junction level
+     */
+    public void liftHighJunction(){
+        robot.motorLift.setTargetPosition(robot.JUNCTION_HIGH);
+        robot.motorLift.setPower(1);
+    }
+
+    /**
+     * Method: openClaw
+     *  -   open the claw
+     */
+    public void openClaw(){
+        robot.servoGrabber.setPosition(robot.CLAW_OPEN);
+    }
+
+    /**
+     * Method: closeClaw
+     *  -   close the claw
+     */
+    public void closeClaw(){
+        robot.servoGrabber.setPosition(robot.CLAW_CLOSE);
+    }
+
 
     /*
      * ###########################################################################################
@@ -413,6 +411,50 @@ public class DriveClass {
      * ###########################################################################################
      * ###########################################################################################
      */
+
+    /**
+     *  Method: updateError
+     *  -   uses the gyro values to determine current angular position.
+     *  -   This method will calculate the variance between the current robot angle and the target angle
+     *  -   Note: this method is a sub method of PIDRotate
+     * @param targetAngle     - angle that the robot would like to turn to
+     */
+    private double updateError(double targetAngle){
+        double calculatedError = 0;
+
+        if (targetAngle > 100 || targetAngle < -100) {
+            calculatedError = gyro360(targetAngle) - targetAngle;
+        } else {
+            calculatedError = getZAngle() - targetAngle;}
+
+        return(calculatedError);
+    }
+
+    /**
+     * Method gyro360
+     *  - Causes the Gyro to behave in 360 mode instead of 180 degree mode
+     * @param targetAngle - Reference angle for the gyro sensor
+     */
+    private double gyro360(double targetAngle){
+        double currentZ = getZAngle();
+        double rotationalAngle;
+
+        if (targetAngle > 0){
+            if ((currentZ >= 0) && (currentZ <= 180)) {
+                rotationalAngle = currentZ;
+            } else {
+                rotationalAngle = 180 + (180 + currentZ);
+            }// end if(currentZ <=0) - else
+        } else {
+            if ((currentZ <= 0) && (currentZ >= -180)) {
+                rotationalAngle = currentZ;
+            } else {
+                rotationalAngle = -180 - (180 - currentZ);
+            }   // end if(currentZ <=0) - else
+        }   // end if(targetAngle >0)-else
+
+        return rotationalAngle;
+    }   // end method gyro360
 
     /**
      * Method getRunTime
@@ -430,25 +472,6 @@ public class DriveClass {
     public double getZAngle(){
         return (-robot.imu.getAngularOrientation().firstAngle);
     }   // close getZAngle method
-
-    /**
-     * Method getRPM()
-     *  -   This method returns the ticks per second required for a specified RPM value
-     * @param tickValue
-     */
-    public double getRPM(double tickValue){
-        return (tickValue/28*60);
-    }
-
-    /**
-     * Method rpmValue()
-     *  -   This method returns the ticks per second required for a specified RPM value
-     * @param targetRPM
-     */
-    public double rpmValue(double targetRPM){
-        return (targetRPM*28/60);
-    }
-
 
     /**
      * Method updateValues
@@ -472,6 +495,8 @@ public class DriveClass {
 
     /**
      * Method: calcDistance
+     * -    Calculates the distance that the robot has traveled based on starting values.
+     * Note: These calculations work when driving forward for strafing at 90 degree angles.
      * @param heading   - indicates the direction the robot is angled/heading
      * @param rfStart   - Right Front starting encoder value
      * @param rrStart   - Right Rear starting encoder value

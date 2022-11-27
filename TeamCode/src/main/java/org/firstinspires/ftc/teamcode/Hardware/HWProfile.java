@@ -4,32 +4,31 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class HWProfile {
     //constants
-    public final double clawOpen=0.3;
-    public final double clawClosed=0.55;
+    public final double CLAW_OPEN =0.3;
+    public final double CLAW_CLOSE =0.55;
 
-    public final double power=1;
+    public final double MAX_DRIVE_POWER =1;
 
-    public final int liftMax=4300;
-    public final int liftMin=0;
-
-    public final double buttonTimeout=0.5;
+    public final double BUTTON_TIMEOUT =0.5;
 
     public final double STRAFE_FACTOR = 0.75;
 
     final public double DRIVE_TICKS_PER_INCH = 23.7;
     final public double USD_COUNTS_PER_INCH = 23.7;
 
+    final public int MAX_LIFT_VALUE = 5000;
+    final public int MIN_LIFT_VALUE = 0;
     final public int JUNCTION_LOWER = 2000;
     final public int JUNCTION_MID = 4000;
     final public int JUNCTION_HIGH = 5000;
+
+    final public double MIN_PIDROTATE_POWER = 0.2;
 
     /* Public OpMode members. */
     public DcMotor motorLF   = null;
@@ -85,7 +84,6 @@ public class HWProfile {
         motorRR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motorRR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorRR.setPower(0);
-
 
         //lift motor init
         motorLift = hwMap.get(DcMotor.class, "motorLift");
