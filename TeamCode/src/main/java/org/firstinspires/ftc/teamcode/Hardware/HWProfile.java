@@ -22,8 +22,14 @@ public class HWProfile {
 
     public final double buttonTimeout=0.5;
 
-    final public double DRIVE_TICKS_PER_INCH = 31;
-    final public double USD_COUNTS_PER_INCH = 31;
+    public final double STRAFE_FACTOR = 0.75;
+
+    final public double DRIVE_TICKS_PER_INCH = 23.7;
+    final public double USD_COUNTS_PER_INCH = 23.7;
+
+    final public int JUNCTION_LOWER = 2000;
+    final public int JUNCTION_MID = 4000;
+    final public int JUNCTION_HIGH = 5000;
 
     /* Public OpMode members. */
     public DcMotor motorLF   = null;
@@ -53,39 +59,41 @@ public class HWProfile {
 
         // Define and Initialize Motors
         motorLF = hwMap.get(DcMotorEx.class, "motorLF");
-        motorLR = hwMap.get(DcMotorEx.class, "motorLR");
-        motorRF = hwMap.get(DcMotorEx.class, "motorRF");
-        motorRR = hwMap.get(DcMotorEx.class, "motorRR");
-        motorLF.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        motorLR.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
-        motorRF.setDirection(DcMotor.Direction.REVERSE);
-        motorRR.setDirection(DcMotor.Direction.REVERSE);
+        motorLF.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
         motorLF.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorLR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorRF.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorRR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        // Set all motors to zero power
+        motorLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorLF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorLF.setPower(0);
+
+        motorLR = hwMap.get(DcMotorEx.class, "motorLR");
+        motorLR.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+        motorLR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorLR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorLR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorLR.setPower(0);
+
+        motorRF = hwMap.get(DcMotorEx.class, "motorRF");
+        motorRF.setDirection(DcMotor.Direction.FORWARD);
+        motorRF.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorRF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorRF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorRF.setPower(0);
+
+        motorRR = hwMap.get(DcMotorEx.class, "motorRR");
+        motorRR.setDirection(DcMotor.Direction.FORWARD);
+        motorRR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorRR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motorRR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorRR.setPower(0);
 
-        // Set all motors to run without encoders.
-        motorLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorLR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorRF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorRR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorLF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorLR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorRF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorRR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         //lift motor init
         motorLift = hwMap.get(DcMotor.class, "motorLift");
-        motorLift.setDirection(DcMotor.Direction.FORWARD);
+        motorLift.setDirection(DcMotor.Direction.REVERSE);
         motorLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorLift.setTargetPosition(0);
+        motorLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorLift.setPower(0);
 
         //init servos
         servoGrabber = hwMap.get(Servo.class, "servoGrabber");
