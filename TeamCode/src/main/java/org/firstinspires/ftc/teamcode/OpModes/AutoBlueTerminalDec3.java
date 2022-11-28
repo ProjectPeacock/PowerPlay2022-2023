@@ -138,12 +138,6 @@ public class AutoBlueTerminalDec3 extends LinearOpMode {
         }
 
         /** Wait for the game to begin */
-
-
-        drive.closeClaw();
-        //robot.servoGrabber.setPosition(robot.clawClosed);
-
-
         telemetry.addData(">", "Press Play to start op mode");
         telemetry.update();
 
@@ -189,6 +183,9 @@ public class AutoBlueTerminalDec3 extends LinearOpMode {
                     break;
 
                 case DETECT_CONE:
+                    drive.closeClaw();
+                    sleep(300);
+
                     autoState = State.SCORE_LOW;
                     break;
 
