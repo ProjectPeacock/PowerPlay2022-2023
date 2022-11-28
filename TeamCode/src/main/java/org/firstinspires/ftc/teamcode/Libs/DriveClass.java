@@ -187,7 +187,7 @@ public class DriveClass {
 
             // Perform a final calc on the error to confirm that the robot didn't overshoot the
             // target position after the last measurement was taken.
-            opMode.sleep(5);
+            opMode.sleep(10);
             error = updateError(targetAngle);
         }   // close outside while loop
 
