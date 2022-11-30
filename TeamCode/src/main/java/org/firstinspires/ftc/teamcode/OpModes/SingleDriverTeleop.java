@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Hardware.HWProfile;
@@ -21,7 +22,7 @@ public class SingleDriverTeleop extends LinearOpMode {
         double power = robot.MAX_DRIVE_POWER;
         double rightX, rightY;
         boolean TSEFlag = false;
-        boolean fieldCentric = false;
+        boolean fieldCentric = true;
         int targetPosition = 0;
         double cupPosition = 0;
 
@@ -29,6 +30,7 @@ public class SingleDriverTeleop extends LinearOpMode {
         double buttonPress = currentTime.time();
 
         robot.init(hardwareMap);
+        robot.motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         telemetry.addData("Ready to Run: ", "GOOD LUCK");
         telemetry.update();

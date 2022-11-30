@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -28,6 +29,8 @@ public class MecanumTeleOp extends LinearOpMode {
         double buttonPress = currentTime.time();
 
         robot.init(hardwareMap);
+        robot.motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
 
         telemetry.addData("Ready to Run: ", "GOOD LUCK");
         telemetry.update();
@@ -52,7 +55,7 @@ public class MecanumTeleOp extends LinearOpMode {
              ****** Mecanum Drive Control section ******
              *******************************************/
             if (fieldCentric) {             // verify that the user hasn't disabled field centric drive
-                theta = robot.imu.getAngularOrientation().firstAngle - 0;
+                theta = robot.imu.getAngularOrientation().firstAngle - 180;
             } else {
                 theta = 0;      // do not adjust for the angular position of the robot
             }
@@ -105,17 +108,20 @@ public class MecanumTeleOp extends LinearOpMode {
              * #############################################################
              */
             if (gamepad2.right_trigger > 0.1 && robot.motorLift.getCurrentPosition()<=robot.MAX_LIFT_VALUE) {
-                liftPosition = liftPosition + 1;
+//                liftPosition = liftPosition + 1;
+                robot.motorLift.setPower(gamepad2.right_trigger);
+
             } else if (gamepad2.left_trigger > 0.1 && robot.motorLift.getCurrentPosition() >= robot.MIN_LIFT_VALUE) {
-                liftPosition = liftPosition - 1;
+                robot.motorLift.setPower(-gamepad2.left_trigger);
+//                liftPosition = liftPosition - 1;
             } else robot.motorLift.setPower(0);
 
             // limit the values of liftPosition => This shouldn't be necessary if logic above works
-            Range.clip(liftPosition, robot.MIN_LIFT_VALUE, robot.MAX_LIFT_VALUE);
+//            Range.clip(liftPosition, robot.MIN_LIFT_VALUE, robot.MAX_LIFT_VALUE);
 
             // move lift to target position
-            robot.motorLift.setTargetPosition(liftPosition);
-            robot.motorLift.setPower(1);
+//            robot.motorLift.setTargetPosition(liftPosition);
+//            robot.motorLift.setPower(1);
 
         }   // end of while(opModeIsActive)
     }   // end of runOpMode()
