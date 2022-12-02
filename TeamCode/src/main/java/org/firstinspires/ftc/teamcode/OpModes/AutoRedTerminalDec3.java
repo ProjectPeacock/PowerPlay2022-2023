@@ -187,7 +187,7 @@ public class AutoRedTerminalDec3 extends LinearOpMode {
                 case DETECT_CONE:
                     // close grab the cone before starting
                     drive.closeClaw();
-                    sleep(300);
+                    sleep(400);
 
                     autoState = State.SCORE_LOW;
                     break;
@@ -227,7 +227,7 @@ public class AutoRedTerminalDec3 extends LinearOpMode {
                     drive.driveDistance(0.3, 180, 4.5);
 
                     // raise lift to appropriate height
-                    drive.liftPosition(850);
+                    drive.liftPosition(900);
 
                     // turn towards cone stack
                     drive.PIDRotate(-90, 2);
@@ -245,7 +245,7 @@ public class AutoRedTerminalDec3 extends LinearOpMode {
                     drive.liftLowerJunction();
                     sleep(500);
 
-                    drive.driveDistance(0.4, 180, 24.5);
+                    drive.driveDistance(0.4, 180, 25);
 
                     autoState = State.SCORE_JUNCTION2;
                     break;
@@ -254,13 +254,13 @@ public class AutoRedTerminalDec3 extends LinearOpMode {
                     drive.PIDRotate(-90, 2);
 
                     // strafe towards junction 2
-                    drive.driveDistance(0.3, -90, 10.5);
+                    drive.driveDistance(0.3, -90, 14);
 
                     // drive forward to place the cone
 //                    drive.driveDistance(0.3, 0, 4);
 
                     // lower the lift
-                    drive.liftPosition(675);
+                    drive.liftPosition(725);
                     sleep(400);
 
                     // open claw and drive backwards
@@ -278,7 +278,7 @@ public class AutoRedTerminalDec3 extends LinearOpMode {
                     drive.PIDRotate(-90, 2);
 
                     // drive towards the cone stack to grab another
-                    drive.driveDistance(0.3, 0, 30);
+                    drive.driveDistance(0.3, 0, 32);
 
                     // close the claw around the cone
                     drive.closeClaw();
@@ -305,7 +305,7 @@ public class AutoRedTerminalDec3 extends LinearOpMode {
                     drive.PIDRotate(0, 2);
 
                     // position in scoring position
-                    drive.driveDistance(0.3, 0, 2);
+                    drive.driveDistance(0.3, 0, 1);
 //                    drive.driveDistance(0.3, 0, 3);
 
                     // lower the lift to place the cone
@@ -320,7 +320,7 @@ public class AutoRedTerminalDec3 extends LinearOpMode {
                     sleep(1000);
 
                     // back away from the junction to allow room for turning
-                    drive.driveDistance(0.2, 180, 1);
+                    drive.driveDistance(0.2, 180, 3);
 
                     // turn towards the cone stack to retrieve another cone or park
                     drive.PIDRotate(-90, 2);
@@ -341,11 +341,12 @@ public class AutoRedTerminalDec3 extends LinearOpMode {
                         drive.PIDRotate(-90, 2);
 
                         // drive to park position 1
-                        drive.driveDistance(0.3, 0,36);
+                        drive.driveDistance(0.3, 0,33);
 
                         // rotate into position for field centric drive
                         drive.PIDRotate(0,2);
-                        drive.driveDistance(0.3, -90, 3);
+                        drive.driveDistance(0.3, -90, 5);
+                        drive.driveDistance(0.3, 180, 5);
                     } else if (position == 2) {
                         // reset the lift
                         drive.liftReset();
@@ -355,7 +356,7 @@ public class AutoRedTerminalDec3 extends LinearOpMode {
                         drive.PIDRotate(-90, 2);
 
                         // drive to park position 1
-                        drive.driveDistance(0.3, 0,11);
+                        drive.driveDistance(0.3, 0,9);
 
                         // rotate into position for field centric drive
                         drive.PIDRotate(0,2);

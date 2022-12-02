@@ -24,9 +24,11 @@ public class HWProfile {
 
     final public int MAX_LIFT_VALUE = 5000;
     final public int MIN_LIFT_VALUE = 0;
-    final public int JUNCTION_LOWER = 2000;
-    final public int JUNCTION_MID = 4000;
-    final public int JUNCTION_HIGH = 5000;
+    final public int JUNCTION_LOWER = 2200;
+//    final public int JUNCTION_MID = 4000;
+    final public int JUNCTION_MID = 3000;
+//    final public int JUNCTION_HIGH = 5000;
+    final public int JUNCTION_HIGH = 4500;
 
     final public double MIN_PIDROTATE_POWER = 0.2;
 
