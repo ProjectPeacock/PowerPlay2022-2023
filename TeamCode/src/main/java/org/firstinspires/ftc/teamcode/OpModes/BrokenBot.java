@@ -75,6 +75,7 @@ public class BrokenBot extends LinearOpMode {
             robot.motorRR.setPower(com.qualcomm.robotcore.util.Range.clip((v4), -power, power));
 
             // Control which direction is forward and which is backward from the driver POV
+            /*
             if (gamepad1.y && (currentTime.time() - buttonPress) > robot.BUTTON_TIMEOUT) {
                 if (theta2 == 180) {
                     theta2 = 0;
@@ -83,26 +84,27 @@ public class BrokenBot extends LinearOpMode {
                 }
                 buttonPress = currentTime.time();
             }   // end if (gamepad1.x && ...)
+             */
 
             /*
              * #############################################################
              * #################### LIFT CONTROL ###########################
              * #############################################################
              */
-            if (gamepad2.right_trigger > 0.1 && robot.motorLift.getCurrentPosition()<=robot.MAX_LIFT_VALUE) {
-                liftPosition = liftPosition + 1;
-            } else if (gamepad2.left_trigger > 0.1 && robot.motorLift.getCurrentPosition() >= robot.MIN_LIFT_VALUE) {
-                liftPosition = liftPosition - 1;
+            if (gamepad1.right_trigger > 0.1 && robot.motorLift.getCurrentPosition() < robot.MAX_LIFT_VALUE) {
+                liftPosition = liftPosition + 10;
+            } else if (gamepad1.left_trigger > 0.1 && robot.motorLift.getCurrentPosition() >= robot.MIN_LIFT_VALUE) {
+                liftPosition = liftPosition - 10;
             } else
                 //robot.motorLift.setPower(0);
 
-            if (gamepad2.a) {
+            if (gamepad1.a) {
                 liftPosition = robot.JUNCTION_LOWER;
-            } else if (gamepad2.b){
+            } else if (gamepad1.b){
                 liftPosition = robot.JUNCTION_MID;
-            } else if (gamepad2.y) {
+            } else if (gamepad1.y) {
                 liftPosition = robot.JUNCTION_HIGH;
-            } else if(gamepad2.x) {
+            } else if(gamepad1.x) {
                 liftPosition = 0;
             }
             // limit the values of liftPosition => This shouldn't be necessary if logic above works
@@ -110,9 +112,9 @@ public class BrokenBot extends LinearOpMode {
 
             // move lift to target position
             robot.motorLift.setTargetPosition(liftPosition);
-            robot.motorLift.setPower(0.5);
+            robot.motorLift.setPower(1);
 
-            if(gamepad1.a&&(currentTime.time() - buttonPress) > robot.BUTTON_TIMEOUT){
+            if((gamepad1.right_stick_button || gamepad2.dpad_down) && (currentTime.time() - buttonPress) > robot.BUTTON_TIMEOUT){
                 clawOpen=!clawOpen;
                 buttonPress = currentTime.time();
             }

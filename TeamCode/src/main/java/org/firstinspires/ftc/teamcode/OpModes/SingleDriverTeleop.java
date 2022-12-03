@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Hardware.HWProfile;
 
@@ -23,7 +24,7 @@ public class SingleDriverTeleop extends LinearOpMode {
         double rightX, rightY;
         boolean TSEFlag = false;
         boolean fieldCentric = true;
-        int targetPosition = 0;
+        int liftPosition = 0;
         double cupPosition = 0;
 
         ElapsedTime currentTime = new ElapsedTime();
@@ -53,14 +54,14 @@ public class SingleDriverTeleop extends LinearOpMode {
              ****** Mecanum Drive Control section ******
              *******************************************/
             if (fieldCentric) {             // verify that the user hasn't disabled field centric drive
-                theta = robot.imu.getAngularOrientation().firstAngle - 90;
+                theta = -robot.imu.getAngularOrientation().firstAngle - 0;
             } else {
                 theta = 0;      // do not adjust for the angular position of the robot
             }
 
-            robotAngle = Math.atan2(gamepad1.left_stick_y, (-gamepad1.left_stick_x)) - Math.PI / 4;
-            rightX = gamepad1.right_stick_x*0.5;
-            rightY = gamepad1.right_stick_y;
+            robotAngle = (Math.atan2(gamepad1.left_stick_y, (gamepad1.left_stick_x)) - Math.PI / 4);
+            rightX = -gamepad1.right_stick_x;
+            rightY = -gamepad1.right_stick_y;
             r = -Math.hypot(gamepad1.left_stick_x, -gamepad1.left_stick_y);
 
             v1 = (r * Math.cos(robotAngle - Math.toRadians(theta + theta2)) + rightX + rightY);
@@ -80,6 +81,7 @@ public class SingleDriverTeleop extends LinearOpMode {
             } */
 
             // Control which direction is forward and which is backward from the driver POV
+            /*
             if (gamepad1.y && (currentTime.time() - buttonPress) > robot.BUTTON_TIMEOUT) {
                 if (theta2 == 180) {
                     theta2 = 0;
@@ -88,15 +90,37 @@ public class SingleDriverTeleop extends LinearOpMode {
                 }
                 buttonPress = currentTime.time();
             }   // end if (gamepad1.x && ...)
+            */
 
-            if (gamepad1.right_trigger > 0.1&&robot.motorLift.getCurrentPosition()<=robot.MAX_LIFT_VALUE) {
-                robot.motorLift.setPower(gamepad1.right_trigger);
-            } else if (gamepad1.left_trigger > 0.1) {
-//            } else if (gamepad2.left_trigger > 0.1&&robot.motorLift.getCurrentPosition()>=robot.liftMin) {
-                robot.motorLift.setPower(-gamepad1.left_trigger);
-            } else robot.motorLift.setPower(0);
+            /*
+             * #############################################################
+             * #################### LIFT CONTROL ###########################
+             * #############################################################
+             */
+            if (gamepad1.right_trigger > 0.1 && robot.motorLift.getCurrentPosition() < robot.MAX_LIFT_VALUE) {
+                liftPosition = liftPosition + 10;
+            } else if (gamepad1.left_trigger > 0.1 && robot.motorLift.getCurrentPosition() >= robot.MIN_LIFT_VALUE) {
+                liftPosition = liftPosition - 10;
+            } else
+                //robot.motorLift.setPower(0);
 
-            if(gamepad1.a&&(currentTime.time() - buttonPress) > robot.BUTTON_TIMEOUT){
+                if (gamepad1.a) {
+                    liftPosition = robot.JUNCTION_LOWER;
+                } else if (gamepad1.b){
+                    liftPosition = robot.JUNCTION_MID;
+                } else if (gamepad1.y) {
+                    liftPosition = robot.JUNCTION_HIGH;
+                } else if(gamepad1.x) {
+                    liftPosition = 0;
+                }
+            // limit the values of liftPosition => This shouldn't be necessary if logic above works
+            Range.clip(liftPosition, robot.MIN_LIFT_VALUE, robot.MAX_LIFT_VALUE);
+
+            // move lift to target position
+            robot.motorLift.setTargetPosition(liftPosition);
+            robot.motorLift.setPower(1);
+
+            if((gamepad1.right_stick_button || gamepad2.dpad_down) && (currentTime.time() - buttonPress) > robot.BUTTON_TIMEOUT){
                 clawOpen=!clawOpen;
                 buttonPress = currentTime.time();
             }
