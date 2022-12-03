@@ -225,7 +225,7 @@ public class AutoBlueTerminalDec3 extends LinearOpMode {
                     drive.driveDistance(0.3, 0, 75);
 
                     // raise lift to appropriate height
-                    drive.liftPosition(775);
+                    drive.liftPosition(900);
 
                     // back up to turn towards cone stack
                     drive.driveDistance(0.3, 180, 3);
@@ -300,7 +300,7 @@ public class AutoBlueTerminalDec3 extends LinearOpMode {
 
                 case SCORE_CONE3:
                     // drive back towards the high goal
-                    drive.driveDistance(0.3, 180, 40);
+                    drive.driveDistance(0.3, 180, 42);
 
                     // turn towards the high junction
                     drive.PIDRotate(0, 2);
@@ -360,7 +360,7 @@ public class AutoBlueTerminalDec3 extends LinearOpMode {
                         drive.PIDRotate(90, 2);
 
                         // drive to park position 1
-                        drive.driveDistance(0.3, 0,15);
+                        drive.driveDistance(0.3, 0,13);
 
                         // rotate into position for field centric drive
                         drive.PIDRotate(0,2);

@@ -204,7 +204,7 @@ public class AutoRedTerminalDec3 extends LinearOpMode {
 //                    sleep(500);
                     drive.liftReset();
 
-                    sleep(300);
+                    sleep(400);
                     drive.openClaw();
 
                     // drove towards the junction

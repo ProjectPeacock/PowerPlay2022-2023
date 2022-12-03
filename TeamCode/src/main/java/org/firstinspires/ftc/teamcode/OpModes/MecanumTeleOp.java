@@ -18,7 +18,7 @@ public class MecanumTeleOp extends LinearOpMode {
     public void runOpMode() {
         double v1, v2, v3, v4, robotAngle;
         double theta;
-        double theta2 = 180;
+        double theta2 = 0;
         double r;
         double power = robot.MAX_DRIVE_POWER;
         double rightX, rightY;
@@ -76,7 +76,7 @@ public class MecanumTeleOp extends LinearOpMode {
             robot.motorRR.setPower(com.qualcomm.robotcore.util.Range.clip((v4), -power, power));
 
             // Control which direction is forward and which is backward from the driver POV
-            if (gamepad1.y && (currentTime.time() - buttonPress) > robot.BUTTON_TIMEOUT) {
+ /*          if (gamepad1.y && (currentTime.time() - buttonPress) > robot.BUTTON_TIMEOUT) {
                 if (theta2 == 180) {
                     theta2 = 0;
                 } else {
@@ -84,7 +84,7 @@ public class MecanumTeleOp extends LinearOpMode {
                 }
                 buttonPress = currentTime.time();
             }   // end if (gamepad1.y && ...)
-
+*/
 
             /*
              * #############################################################
@@ -107,20 +107,20 @@ public class MecanumTeleOp extends LinearOpMode {
              * #################### LIFT CONTROL ###########################
              * #############################################################
              */
-            if (gamepad1.right_trigger > 0.1 && robot.motorLift.getCurrentPosition() < robot.MAX_LIFT_VALUE) {
+            if (gamepad2.right_trigger > 0.1 && robot.motorLift.getCurrentPosition() < robot.MAX_LIFT_VALUE) {
                 liftPosition = liftPosition + 10;
-            } else if (gamepad1.left_trigger > 0.1 && robot.motorLift.getCurrentPosition() >= robot.MIN_LIFT_VALUE) {
+            } else if (gamepad2.left_trigger > 0.1 && robot.motorLift.getCurrentPosition() >= robot.MIN_LIFT_VALUE) {
                 liftPosition = liftPosition - 10;
             } else
                 //robot.motorLift.setPower(0);
 
-                if (gamepad1.a) {
+                if (gamepad2.a) {
                     liftPosition = robot.JUNCTION_LOWER;
-                } else if (gamepad1.b){
+                } else if (gamepad2.b){
                     liftPosition = robot.JUNCTION_MID;
-                } else if (gamepad1.y) {
+                } else if (gamepad2.y) {
                     liftPosition = robot.JUNCTION_HIGH;
-                } else if(gamepad1.x) {
+                } else if(gamepad2.x) {
                     liftPosition = 0;
                 }
             // limit the values of liftPosition => This shouldn't be necessary if logic above works

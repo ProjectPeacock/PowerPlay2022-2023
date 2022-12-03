@@ -18,7 +18,7 @@ public class SingleDriverTeleop extends LinearOpMode {
     public void runOpMode() {
         double v1, v2, v3, v4, robotAngle;
         double theta;
-        double theta2 = 180;
+        double theta2 = 0;
         double r;
         double power = robot.MAX_DRIVE_POWER;
         double rightX, rightY;
