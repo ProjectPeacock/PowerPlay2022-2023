@@ -29,7 +29,7 @@ public class MecanumTeleOp extends LinearOpMode {
         double buttonPress = currentTime.time();
 
         robot.init(hardwareMap);
-        robot.motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        robot.motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
         telemetry.addData("Ready to Run: ", "GOOD LUCK");
