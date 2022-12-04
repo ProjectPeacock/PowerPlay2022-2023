@@ -52,9 +52,9 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@Autonomous(name = "Auto: Red Terminal Dec 3rd", group = "Competition")
+@Autonomous(name = "Auto: Red Terminal 1 Only", group = "Competition")
 
-public class AutoRedTerminalDec3 extends LinearOpMode {
+public class AutoRedTerminal1Only extends LinearOpMode {
 
     /*
      * Specify the source for the Tensor Flow Model.
@@ -214,7 +214,13 @@ public class AutoRedTerminalDec3 extends LinearOpMode {
 
 //                    drive.PIDRotate(0, 2);
 
-                    autoState = State.RETRIEVE_CONE2;
+                    // push signal cone out of the way
+                    drive.driveDistance(0.3, 0, 76);
+
+                    // back up to turn towards cone stack
+                    drive.driveDistance(0.3, 180, 40);
+
+                    autoState = State.PARK;
                     break;
 
                 case RETRIEVE_CONE2:
@@ -338,25 +344,24 @@ public class AutoRedTerminalDec3 extends LinearOpMode {
                         drive.openClaw();
 
                         // rotate towards the park 1 position
-                        drive.PIDRotate(-90, 2);
+                        //drive.PIDRotate(-90, 2);
 
                         // drive to park position 1
-                        drive.driveDistance(0.3, 0,33);
+                        drive.driveDistance(0.3, -90,30);
 
                         // rotate into position for field centric drive
                         drive.PIDRotate(0,2);
-                        drive.driveDistance(0.3, -90, 5);
-                        drive.driveDistance(0.3, 180, 5);
                     } else if (position == 2) {
                         // reset the lift
                         drive.liftReset();
                         drive.openClaw();
 
                         // rotate towards the outside wall position
-                        drive.PIDRotate(-90, 2);
+                        /*drive.PIDRotate(-90, 2);
 
                         // drive to park position 1
-                        drive.driveDistance(0.3, 0,9);
+         //               drive.driveDistance(0.3, 0,9);
+                        */
 
                         // rotate into position for field centric drive
                         drive.PIDRotate(0,2);
@@ -366,10 +371,10 @@ public class AutoRedTerminalDec3 extends LinearOpMode {
                         drive.openClaw();
 
                         // rotate towards the outside wall position
-                        drive.PIDRotate(-90, 2);
+                        //drive.PIDRotate(90, 2);
 
                         // drive to park position 1
-                        drive.driveDistance(0.3, 180,15);
+                        drive.driveDistance(0.3, 90,24);
 
                         // rotate into position for field centric drive
                         drive.PIDRotate(0,2);

@@ -108,9 +108,9 @@ public class MecanumTeleOp extends LinearOpMode {
              * #############################################################
              */
             if (gamepad2.right_trigger > 0.1 && robot.motorLift.getCurrentPosition() < robot.MAX_LIFT_VALUE) {
-                liftPosition = liftPosition + 10;
+                liftPosition = liftPosition + 18;
             } else if (gamepad2.left_trigger > 0.1 && robot.motorLift.getCurrentPosition() >= robot.MIN_LIFT_VALUE) {
-                liftPosition = liftPosition - 10;
+                liftPosition = liftPosition - 18;
             } else
                 //robot.motorLift.setPower(0);
 
