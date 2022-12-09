@@ -63,14 +63,14 @@ public class AutoBlueTerminalDec3 extends LinearOpMode {
      * has been downloaded to the Robot Controller's SD FLASH memory, it must to be loaded using loadModelFromFile()
      * Here we assume it's an Asset.    Also see method initTfod() below .
      */
-    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
+    private static final String TFOD_MODEL_ASSET = "model_20221208_140441.tflite";
     // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
 
 
     private static final String[] LABELS = {
-            "1 Bolt",
-            "2 Bulb",
-            "3 Panel"
+            "Logo",
+            "Peacock",
+            "Qrcode"
     };
 
     /*
@@ -161,11 +161,11 @@ public class AutoBlueTerminalDec3 extends LinearOpMode {
                         telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100 );
                         telemetry.addData("- Position (Row/Col)","%.0f / %.0f", row, col);
                         telemetry.addData("- Size (Width/Height)","%.0f / %.0f", width, height);
-                        if(recognition.getLabel() == "1 Bolt"){
+                        if(recognition.getLabel() == "Peacock"){
                             position =1;
-                        } else if(recognition.getLabel() == "2 Bulb" ){
-                            position = 2;
-                        } else position = 3;
+                        } else if(recognition.getLabel() == "Logo" ){
+                            position = 3;
+                        } else position = 2;
                     }
                     telemetry.update();
                 }
