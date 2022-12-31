@@ -1,13 +1,17 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
 
+import com.arcrobotics.ftclib.gamepad.ButtonReader;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Hardware.HWProfile;
+
+import java.util.List;
 
 @TeleOp(name = "Single Driver Teleop Mode", group = "Competition")
 
@@ -16,144 +20,133 @@ public class SingleDriverTeleop extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        double v1, v2, v3, v4, robotAngle;
-        double theta;
-        double theta2 = 0;
-        double r;
-        double power = robot.MAX_DRIVE_POWER;
-        double rightX, rightY;
-        boolean TSEFlag = false;
-        boolean fieldCentric = true;
-        int liftPosition = 0;
-        double cupPosition = 0;
-
-        ElapsedTime currentTime = new ElapsedTime();
-        double buttonPress = currentTime.time();
-
         robot.init(hardwareMap);
-//        robot.motorLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        GamepadEx gp1 = new GamepadEx(gamepad1);
+        ButtonReader aReader = new ButtonReader(gp1, GamepadKeys.Button.A);
+        ButtonReader bReader = new ButtonReader(gp1, GamepadKeys.Button.B);
+        ButtonReader xReader = new ButtonReader(gp1, GamepadKeys.Button.X);
+        ButtonReader yReader = new ButtonReader(gp1, GamepadKeys.Button.Y);
+        ButtonReader liftResetButton = new ButtonReader(gp1, GamepadKeys.Button.RIGHT_BUMPER);
 
         telemetry.addData("Ready to Run: ", "GOOD LUCK");
         telemetry.update();
 
-        boolean shippingElement = false;
-        boolean armDeployed = false;
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
-        boolean clawOpen = true;
+        boolean clawToggle=false, clawReady=false;
+        boolean antiTip=true;
+        double forwardPower=0, strafePower=0, liftPower=.5;
+        int liftPos=0;
 
         waitForStart();
+        double startTilt=robot.imu.getAngles()[robot.ANTI_TIP_AXIS], currentTilt=0, tip=0;
+/*
+        robot.winchMotors.resetEncoder();
+*/
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
+
 
         while (opModeIsActive()) {
-            if(gamepad1.right_trigger>0.1&&gamepad1.right_trigger<0.8) {
-                power*=0.5;
-            }else if(gamepad1.right_trigger<0.1){
-                power=robot.MAX_DRIVE_POWER;
-            }
+            forwardPower=gp1.getLeftY();
+            strafePower=gp1.getLeftX();
 
-            /*******************************************
-             ****** Mecanum Drive Control section ******
-             *******************************************/
-            if (fieldCentric) {             // verify that the user hasn't disabled field centric drive
-                theta = -robot.imu.getAngularOrientation().firstAngle - 0;
-            } else {
-                theta = 0;      // do not adjust for the angular position of the robot
-            }
-
-            robotAngle = (Math.atan2(gamepad1.left_stick_y, (gamepad1.left_stick_x)) - Math.PI / 4);
-            rightX = -gamepad1.right_stick_x;
-            rightY = -gamepad1.right_stick_y;
-            r = -Math.hypot(gamepad1.left_stick_x, -gamepad1.left_stick_y);
-
-            v1 = (r * Math.cos(robotAngle - Math.toRadians(theta + theta2)) + rightX + rightY);
-            v2 = (r * Math.sin(robotAngle - Math.toRadians(theta + theta2)) - rightX + rightY);
-            v3 = (r * Math.sin(robotAngle - Math.toRadians(theta + theta2)) + rightX + rightY);
-            v4 = (r * Math.cos(robotAngle - Math.toRadians(theta + theta2)) - rightX + rightY);
-
-            robot.motorLF.setPower(com.qualcomm.robotcore.util.Range.clip((v1), -power, power));
-            robot.motorRF.setPower(com.qualcomm.robotcore.util.Range.clip((v2), -power, power));
-            robot.motorLR.setPower(com.qualcomm.robotcore.util.Range.clip((v3), -power, power));
-            robot.motorRR.setPower(com.qualcomm.robotcore.util.Range.clip((v4), -power, power));
-
-            /*if (gamepad1.right_trigger > 0.1&&power < 1) {
-                power +=.05;
-            } else if (gamepad1.left_trigger > 0.1&&power > 0) {
-                power -= 0.05;
-            } */
-
-            // Control which direction is forward and which is backward from the driver POV
-            /*
-            if (gamepad1.y && (currentTime.time() - buttonPress) > robot.BUTTON_TIMEOUT) {
-                if (theta2 == 180) {
-                    theta2 = 0;
-                } else {
-                    theta2 = 180;
+            //anti-tip "algorithm"
+            if(antiTip){
+                currentTilt=robot.imu.getAngles()[robot.ANTI_TIP_AXIS];
+                tip = Math.abs(currentTilt-startTilt);
+                //if robot is tipped more than tolerance, multiply drive power by adjustment
+                if(tip>robot.ANTI_TIP_TOL*2){
+                    forwardPower*=-1;
+                }else if(tip>robot.ANTI_TIP_TOL){
+                    forwardPower*=robot.ANTI_TIP_ADJ;
                 }
-                buttonPress = currentTime.time();
-            }   // end if (gamepad1.x && ...)
-            */
+            }
+
+            //mecanum drive setups
+            if(robot.fieldCentric){
+                //field centric setup
+                robot.mecanum.driveFieldCentric(strafePower,forwardPower,-gp1.getRightX()*robot.TURN_MULTIPLIER,robot.imu.getRotation2d().getDegrees()+180, true);
+            }else{
+                //robot centric setup
+                robot.mecanum.driveRobotCentric(strafePower,forwardPower,-gp1.getRightX()*robot.TURN_MULTIPLIER, true);
+            }
+
+            //lift power (take analog from triggers, apply to variable, variable gets applied to motors
 
             /*
-             * #############################################################
-             * #################### LIFT CONTROL ###########################
-             * #############################################################
+            if(gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)>0.1){
+                liftPower=gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
+            }else if(gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)>0.1){
+                liftPower=-gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
+            }else{
+                liftPower=0;
+            }
+
              */
-            if (gamepad1.right_trigger > 0.1 && robot.motorLift.getCurrentPosition() < robot.MAX_LIFT_VALUE) {
-                liftPosition = liftPosition + 10;
-            } else if (gamepad1.left_trigger > 0.1 && robot.motorLift.getCurrentPosition() >= robot.MIN_LIFT_VALUE) {
-                liftPosition = liftPosition - 10;
-            } else
-                //robot.motorLift.setPower(0);
 
-                if (gamepad1.a) {
-                    liftPosition = robot.JUNCTION_LOWER;
-                } else if (gamepad1.b){
-                    liftPosition = robot.JUNCTION_MID;
-                } else if (gamepad1.y) {
-                    liftPosition = robot.JUNCTION_HIGH;
-                } else if(gamepad1.x) {
-                    liftPosition = 0;
-                }
-            // limit the values of liftPosition => This shouldn't be necessary if logic above works
-            Range.clip(liftPosition, robot.MIN_LIFT_VALUE, robot.MAX_LIFT_VALUE);
-
-            // move lift to target position
-            robot.motorLift.setTargetPosition(liftPosition);
-            robot.motorLift.setPower(1);
-
-            if((gamepad1.right_stick_button || gamepad2.dpad_down) && (currentTime.time() - buttonPress) > robot.BUTTON_TIMEOUT){
-                clawOpen=!clawOpen;
-                buttonPress = currentTime.time();
+            //claw control
+            if(aReader.isDown()&&clawReady){
+                clawToggle=!clawToggle;
             }
-
-            if (clawOpen) {
+            //forces claw to only open or close if button is pressed once, not held
+            if(!aReader.isDown()){
+                clawReady=true;
+            }else{
+                clawReady=false;
+            }
+            //apply value to claw
+            if (clawToggle) {
                 robot.servoGrabber.setPosition(robot.CLAW_OPEN);
             } else {
                 robot.servoGrabber.setPosition(robot.CLAW_CLOSE);
             }
 
+            if (gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > .1) {
+                liftPower=-gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)*0.5;
+            }
+            if (gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > .1){
+                liftPower=gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
+            }
+
+
+            /*
+            if(xReader.isDown()){
+                liftPos=robot.JUNCTION_LOWER;
+            }else if(yReader.isDown()) {
+                liftPos=robot.JUNCTION_MID;
+            }else if(bReader.isDown()){
+                liftPos=robot.JUNCTION_HIGH;
+            }else if(liftResetButton.isDown()){
+                liftPos = 0;
+            }
+            */
+
+            liftPos = Range.clip(liftPos, robot.LIFT_RESET, robot.MAX_LIFT_VALUE);
+            robot.motorLiftFront.setTargetPosition(liftPos);
+            robot.motorLiftRear.setTargetPosition(liftPos);
+            robot.motorLiftFront.setPower(liftPower);
+            robot.motorLiftRear.setPower(liftPower);
 
             // Provide user feedback
-            telemetry.addData("lift position:", robot.motorLift.getCurrentPosition());
-            telemetry.addData("power",power);
-            telemetry.addData("V1 = ", v1);
-            telemetry.addData("V2 = ", v2);
-            telemetry.addData("V3 = ", v3);
-            telemetry.addData("V4 = ", v4);
-            telemetry.addData("Robot Angle = ", robotAngle);
-            telemetry.addData("IMU First Angle = ", robot.imu.getAngularOrientation().firstAngle);
-            telemetry.addData("IMU Second Angle = ", robot.imu.getAngularOrientation().secondAngle);
-            telemetry.addData("IMU Third Angle = ", robot.imu.getAngularOrientation().thirdAngle);
-            telemetry.addData("dpad_up = ", gamepad1.dpad_up);
-            telemetry.addData("dpad_down = ", gamepad1.dpad_down);
-            telemetry.addData("dpad_left = ", gamepad1.dpad_left);
-            telemetry.addData("dpad_right = ", gamepad1.dpad_right);
-            telemetry.addData("Left Stick X = ", gamepad1.left_stick_x);
-            telemetry.addData("Left Stick Y = ", gamepad1.left_stick_y);
-            telemetry.addData("Right Stick X = ", gamepad1.right_stick_x);
-            telemetry.addData("Right Stick Y = ", gamepad1.right_stick_y);
-            telemetry.addData("Theta = ", theta);
-            telemetry.addData("Theta2 = ", theta);
-            telemetry.addData("IMU Value: ", theta);
+            //telemetry.addData("lift position = ", robot.liftEncoder.getPosition());
+            telemetry.addData("Lift Position = ", liftPos);
+            telemetry.addData("Lift power = ",liftPower);
+            telemetry.addData("Claw open = ", clawToggle);
+            telemetry.addData("Current tip = ",tip);
+            telemetry.addData("IMU Angles X = ", robot.imu.getAngles()[0]);
+            telemetry.addData("IMU Angles Y = ", robot.imu.getAngles()[1]);
+            telemetry.addData("IMU Angles Z = ", robot.imu.getAngles()[2]);
+            telemetry.addData("dpad_up = ", gp1.getButton(GamepadKeys.Button.DPAD_UP));
+            telemetry.addData("dpad_down = ", gp1.getButton(GamepadKeys.Button.DPAD_DOWN));
+            telemetry.addData("dpad_left = ", gp1.getButton(GamepadKeys.Button.DPAD_LEFT));
+            telemetry.addData("dpad_right = ", gp1.getButton(GamepadKeys.Button.DPAD_RIGHT));
+            telemetry.addData("Left Stick X = ", gp1.getLeftX());
+            telemetry.addData("Left Stick Y = ", gp1.getLeftY());
+            telemetry.addData("Right Stick X = ", gp1.getRightX());
+            telemetry.addData("Right Stick Y = ", gp1.getRightY());
             telemetry.update();
 
         }   // end of while(opModeIsActive)
