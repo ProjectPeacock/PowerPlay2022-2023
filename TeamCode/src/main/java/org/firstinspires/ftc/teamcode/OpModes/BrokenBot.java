@@ -29,8 +29,8 @@ public class BrokenBot extends LinearOpMode {
     public static int l4_LIFT_JUNCTION_MID = robot.LIFT_JUNCTION_MID;
     public static int l5_LIFT_JUNCTION_LOW = robot.LIFT_JUNCTION_LOWER;
     public static int l6_LIFT_POSITION = 0;
-    public static double l7_Lift_Up_Power = robot.LIFT_UP_POWER;
-    public static double l8_Lift_Down_Power = robot.LIFT_DOWN_POWER;
+    public static double l7_Lift_Up_Power = 1;
+    public static double l8_Lift_Down_Power = 1;
 
     @Override
     public void runOpMode() {
@@ -103,13 +103,13 @@ public class BrokenBot extends LinearOpMode {
             }
 
 
-            if(gp1.isDown(GamepadKeys.Button.DPAD_UP)) {
+            if(gp2.isDown(GamepadKeys.Button.DPAD_UP)) {
                 robot.motorLF.set(1);
-            } else if (gp1.isDown(GamepadKeys.Button.DPAD_DOWN)){
+            } else if (gp2.isDown(GamepadKeys.Button.DPAD_DOWN)){
                 robot.motorLR.set(1);
-            } else if (gp1.isDown(GamepadKeys.Button.DPAD_LEFT)) {
+            } else if (gp2.isDown(GamepadKeys.Button.DPAD_LEFT)) {
                 robot.motorRF.set(1);
-            } else if (gp1.isDown(GamepadKeys.Button.DPAD_RIGHT)){
+            } else if (gp2.isDown(GamepadKeys.Button.DPAD_RIGHT)){
                 robot.motorRR.set(1);
             }
 
@@ -119,12 +119,20 @@ public class BrokenBot extends LinearOpMode {
              * #############################################################
              */
 
+            if (gp1.isDown(GamepadKeys.Button.DPAD_UP)){
+                liftPosition = liftPosition + 40;
+                liftPower = 1;
+            }else if (gp1.isDown(GamepadKeys.Button.DPAD_DOWN)){
+                liftPosition = liftPosition - 40;
+                liftPower = 1;
+            }
+
             if (gp1.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1) {
-                liftPosition = liftPosition - 10;
+                liftPosition = liftPosition - 40;
                 liftPower = l8_Lift_Down_Power;
 
             } else if (gp1.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1) {
-                liftPosition = liftPosition + 10;
+                liftPosition = liftPosition + 40;
                 liftPower = l7_Lift_Up_Power;
             } else {
             }
@@ -154,7 +162,7 @@ public class BrokenBot extends LinearOpMode {
                 liftPower = l7_Lift_Up_Power;
             }
 
-            liftPosition = Range.clip(liftPosition, robot.LIFT_RESET, robot.MAX_LIFT_VALUE);
+            // liftPosition = Range.clip(liftPosition, robot.LIFT_RESET, robot.MAX_LIFT_VALUE);
 
             robot.motorLiftFront.setTargetPosition(liftPosition);
             robot.motorLiftRear.setTargetPosition(liftPosition);
